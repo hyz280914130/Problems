@@ -1,0 +1,4 @@
+1. javascript中的undefined、null
+  如果声明了变量，但未对其赋值，则其默认值为undefined，而不是null，在javascript中null代表没有定义的或空的引用。
+  
+2.
