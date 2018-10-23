@@ -1,0 +1,7 @@
+1.居中标签
+  <center></center>
+  
+2.表格的标题标记和表头标记
+  标题标记：<caption></caption>
+  表头标记：<th></th>
+  
