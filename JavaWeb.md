@@ -1,5 +1,18 @@
 # Problems
 
+### String中几个重要方法的使用
+  indexOf(subString,startString) -- 查找字符串
+    subString:要查找的字符串
+    startIndex:开始查找的位置
+  subStr(start,length) -- 截取字符串
+    从那开始截几个
+  subString(start,end)
+    从哪儿截到哪儿
+  replace()
+    替换一个与正则表达式匹配的子串
+  split()
+    指定标记，分隔字符串
+
 ### js中Function的几种写法
 ```
 //第一种
