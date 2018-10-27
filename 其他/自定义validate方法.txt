@@ -1,0 +1,20 @@
+$.validator.addMethod(
+	
+	"checkUsername",
+	function(value,element,params){
+		var flag = flase
+		$.ajax({
+			"anysn":false,
+			"url":"",
+			"type":"post",
+			"dataType":"json",
+			"success":function(data){
+				flag = data.isExist
+			}
+		});
+		return !false;
+	}
+
+);
+
+数据库返回的数据什么时候写long

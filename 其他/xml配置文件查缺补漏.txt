@@ -1,0 +1,6 @@
+1.struts开启动态方法调用
+	<constant name="struts.enable.DynamicMethodInvocation" value="false"></constant>
+
+2.struts默认配置
+	当配置里的action都对应不上的时候，最后就会执行这个
+	<default-action-ref name="Demo"></default-action-ref>

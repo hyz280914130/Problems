@@ -1,0 +1,23 @@
+1.导包:4+2+ spring-test + spring-aop + junit4类库 + c3p0连接池 + JDBC驱动 + spring-jdbc + spring-tx
+
+2.整合JDBC
+	1.准备数据库
+
+	2.准备UserDao接口：写方法 增删改查查查
+
+	3.准备UserDaoImpl：实现UserDao里的所有方法
+
+	4.配置文件，将DataSource、JDBCTemplate、UserDaoImpl对象交给spring管理，注意它们之间的依赖关系
+
+	5.书写Demo2测试6个方法
+
+	6.进阶：UserDaoImpl继承JDBCDaoSupport
+		JDBCDaoSupport：根据连接池创建jdbc模板，所以配置文件的JDbc模板不依赖连接池了
+
+3.spring中的aop事务
+	1.事务
+	2.spring封装事务管理代码：打开、提交、回滚
+	3.一些概念：在教程中的笔记有
+		PROPAGATION_REQUIRED：如果一方法已经开了事务，那么一方法调用2方法，2方法就使用一方法的事务
+
+4.遇到的最大的问题是，没好好看视频，自己写，然后出现一些问题就是，我一开始没写Demo和Demo2来调用accountService中的transfer方法，结果事务没生效，我想我在配置文件里配的是service中注入了事务的核心管理器，但是我直接运行AccountServiceImpl中的transfer是不经过service对象的，也就是说此时service配置文件中注入的事务属性还没执行，所以事务才没生效。

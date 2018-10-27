@@ -1,0 +1,68 @@
+一、struts_01
+	1.导包，创建配置文件，导入dtd，web.xml的配置
+	2.struts配置文件的具体配置
+		1.结构：常量的配置、包、引入其他文件
+	3.动态方法调用的两种方式
+	4.action各参数的默认值，默认访问的action,还有各属性省略之后的结果
+	5.api
+		1.简单的pojo类
+		2.实现action接口
+		3.继承ActionSupport类 （推荐）
+二、struts_02
+	0.导包、创建主struts、配置web.xml
+	1.result
+		1.编写方法测试转发，配置模块struts
+		2.编写方法测试重定向，配置模块struts
+		3.编写方法测试转发到其他action，配置模块struts
+		4.编写方法测试重定向到其他action，配置模块struts
+	2.api
+		1.通过ActionContext获得解耦和的servlet域对象(request、session、ApplicationContext)的引用,并向里面存入内容。是什么接收类型。
+		2.通过ServletActionContext获得原生的servlet域对象（request、response、session、ServletContext）
+		3.通过接口获得解耦和的servlet对象，RequestAware、SessionAware、ApplicationAware,没有responser，只有Map域对象
+		4.通过接口获得servlet域对象ServletRequestAware,ServletResponseAware,ServletContextAware,没有session域对象
+		4.配置模块配置文件struts
+	3.属性注入（接收参数的四种方式）
+		1.属性驱动 怎么写、前端有什么区别
+		2.对象驱动 怎么写、前端有什么区别
+		3.模型驱动 怎么写、前端有什么区别
+		4.集合封装 怎么写、前端有什么区别
+		5.配置模块struts
+	4.配置主struts
+三、struts_03
+	0.导包、创建主struts、配置web.xml
+	1.ongl（重点）
+		1.ongl语法
+			1.准备ONGLContext
+				1.准备root对象
+				2.准备context对象
+			2.获得OnglContext对象
+			3.将准备的root对象作为Root部分
+			4.将准备的context对象作为Context部分
+			5.书写Ognl
+		2.取出root的值
+		3.取出context中的值
+		4.为属性赋值
+		5.调用方法
+		6.调用静态方法
+		7.ongl创建对象list | map
+	2.s标签的debug标签
+	3.struts值栈（用ognl实现）
+		1.在赋值前要把接收参数的对象压入栈（两种方法）
+	3.在xml中使用ognl表达式---动态的在当前访问的action中找属性，例外在struts.xml中的result中配置的属性识别不出来就会自动的加到url参数后面
+	4.配置主配置文件
+四、struts_04
+	0.导包，创建主struts、配置web.xml
+	1.拦截器之前的准备，代表增删改查的四个方法
+	2.实现拦截器的第一种方法 Interceptor
+	3.实现拦截器的第二张方法 AbstractInterceptor
+	4.实现拦截器的第三种方法 MethodFilterInterceptor
+	5.配置struts.xml,配置自己的拦截器栈，结合第三种拦截器指定那些方法要过滤
+		1.配置/写一个interceptors拦截器集合
+		2.配置拦截器（上面的第三个）
+		3.配置一个拦截器栈，引入第二步的拦截器，配置该拦截器属性，指定那些方法需要过滤或者不过滤，引入struts默认的拦截器栈
+		4.指定默认拦截器栈为我们自定义的拦截器栈
+	6.ognl标签的学习 遍历便签 / if elseif else / property
+		
+
+	
+	

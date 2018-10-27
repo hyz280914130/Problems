@@ -1,0 +1,12 @@
+d = new dTree('d', true); //参数一: 树名称。参数二：单选多选 true多选  false单选  默认单选               
+d.add(0, -1, '权限管理');
+d.add(1, 0, 'authority', '0001', '日常工作', true, false);
+d.add(2, 1, 'authority', '0002', '新建工作', true, false);
+d.add(3, 2, 'authority', '0003', '人事 ', true, false);
+d.add(4, 2, 'authority', '0004', '财务', false, false);
+d.add(5, 2, 'authority', '0005', '客服', false, false);
+d.add(15, 3, 'authority', '0006', '请假申请', false, false);
+d.add(16, 3, 'authority', '0007', '出差申请', false, false);
+d.add(17, 3, 'authority', '0008', '招聘申请', false, false);
+// dTree实例属性以此为：  节点ID，父类ID，chechbox的名称，chechbox的值，chechbox的显示名称，
+//chechbox是否被选中--默认是不选，chechbox是否可用：默认是可用，节点链接：默认是虚链接

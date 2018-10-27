@@ -1,0 +1,36 @@
+js数据类型
+
+js中正则表达式的匹配方式
+
+js中的函数声明和函数调用的两种方式
+匿名 var xxx/xxx.事件 
+
+setInterval(code，millisec)	clearInterval()
+
+setTimeout(code,millisec)	clearTimeout()
+
+js样式获得和修改 style 注意事项
+
+页面加载事件 onload
+
+BOM:	window 
+	Navigator Screen 
+	History: go back forward
+	Location: href
+
+DOM：定时器、消息框（alert confirm prompt）
+
+向标签题写入内容：innerHTML
+
+一些事件：onsubmit onblur onfocus
+
+value获得元素的值
+
+this.setAttribute("xxx",yyy.stley.sss) 缓存当前设置的属性值
+
+checked selected
+
+Array creatElement creatTextNode
+
+
+

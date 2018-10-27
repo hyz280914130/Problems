@@ -1,0 +1,5 @@
+所有能作为id属性的类型，全都继承了Serializable，所以根据id删查等都用Serializable类型
+
+实现BaseDao的时候不知道实现的是什么类型，那就在生命一个泛型，沿用就行
+
+type是顶层接口，是一个标识

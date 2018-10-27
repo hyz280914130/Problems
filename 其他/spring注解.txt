@@ -1,0 +1,24 @@
+@Componnent("user")
+@Controller()
+@Service()
+@Repository()
+@Value
+@Autowired 
+@Qualifier("")
+@Resource(name=")
+@Scope(scopeName="")
+@PostConstruct
+@PreDestroy
+@RunWith()
+@ContextConfiguration()
+
+singleton
+prototype
+
+@Aspect
+@Pointcut("execution(* cn.hyz.service.*ServiceImpl.*(..))")
+@Before("MyAdvice.pc()")
+@AfterReturning("MyAdvice.pc()")
+@Around("MyAdvice.pc()")
+@AfterThrowing("MyAdvice.pc()")
+@After("MyAdvice.pc()")

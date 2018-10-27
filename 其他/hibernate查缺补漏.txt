@@ -1,0 +1,15 @@
+0.addconf.addResource("相对src的xml地址")
+1.setProjection(Projection.rowCount())
+2.Arrays.toString(obj)
+3.query.addEntity(Customer.class);
+4.private Set<Role> roles = new HashSet<Role>();
+5.关于一对多和多对多的column配置
+	一对多中：只有一方有set，set中有key，key中有column，column代表集合的外键，one2many中没有column，many2one中有column，这个column代表对应的外键列名
+	多对多中：两方都有set，set中都有key，key中的column代表：别人引用我的，many2many中的column代表：我引用别人的
+6.cc.addOrder(Order.asc("cust_id"));
+7.DetachedCriteria dc = DetachedCriteria.forClass(Customer.class);
+	Criteria ec = dc.getExecutableCriteria(session);
+8.Validateable, ValidationAware, TextProvider, LocaleProvider
+9.//select DISTINCT(A) from A left join A.b where A.id=? 
+String hql = "from Customer c inner join fetch 	c.linkMens";
+

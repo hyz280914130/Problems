@@ -1,0 +1,23 @@
+1.转发和重定向到Action的result中要写
+	<result name="success" type="chain">
+		<param name="actionName">Demo1</param>
+		<param name="namespace">/result</param>
+	</result>
+
+2.action的三种写法：简单的popj，实现action，继承actionSupport
+
+3.获得域对象的三种方式 AcitionCotext、ServletActionContext、实现ServletRequestAware...
+
+4.接收参数的三种方式：属性驱动，支持自动类型转换，转换的类型包括8大基本类型和其包装类，还有支持特定的数据类型，比如Date
+	对象驱动、模型驱动、集合类型list、map
+
+5.ongl表达式的操作：OnglContext oc = new OnglConetext;
+		Ongl.getValue("",oc,oc,root)
+	欠缺，多看
+
+6.拦截器的三种实现 实现interceptor、继承AbstractInterceptor、MethodFilterInterceptor
+
+7.啊啊啊啊啊啊 拦截器要拦截的方法要和拦截器写在一个包里面
+
+8.感觉要多看几遍struts
+

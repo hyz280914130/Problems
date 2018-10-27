@@ -1,0 +1,1 @@
+servlet是用来转向的，一般的servlet继承了HttpServlet，他里面写了一个service方法来控制转向，在商城抽取方法的这一步，我思考为什么继承了Base类，就能反射调用方法，是这样的，因为我写的servlet都继承Base，而继承Base的子类没有重写service方法，所以默认是调用父类的，而Base父类中重写了service所以每次访问子类中的方法都会调用Base中的service来转向。

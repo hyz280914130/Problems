@@ -1,0 +1,76 @@
+一、spring_01
+	0.导包、创建applicationContext主配置文件,如何导入dtd，还要设置
+	1.创建实体类User，配置applicationContext.xml文件，把user类交给spring管理（空参构造）
+	2.创建容器对象--向容器要对象--打印user对象
+	3.对象创建的三种方式，主要是实体类和配置文件的工作
+		0.创建模块配置文件，创建UserFactory类
+		1.空参构造 在实体类中创建构造方法，配置文件中不需要指定方法
+		2.UserFactory静态工厂创建，给spring管理，配置文件中需要指定方法
+		3.实例工厂创建，配置文件中先创建UserFactory的对象，在获得user3的对象，配置文件中需要指定工厂类对象和方法
+	5.bean元素进阶
+		1.scope属性：singleton、prototype、request、session
+		2.生命周期属性：init、destroy方法
+	6.属性注入
+		0.在User类中创建不同的构造函数，不同类型参数，不同顺序参数的构造函数
+		1.set属性注入
+		2.构造函数属性注入 index和type组合可以指定任何构造函数
+		3.p名称空间注入
+		4.spel注入 spring表达式语言注入
+	7.set属性注入方法又有复杂类型注入
+		0.创建CollectionBean（集合bean） List、Map、Object、Properties
+		1.配置
+	8.主配置文件中导入模块配置文件
+
+二、crm系统
+	1.主要是获得spring，和把service、dao 对象交给spring管理，其它没难度
+
+三、spring_02
+	0.导包（需要导一个Aop包），创建applicationContext主配置文件，导入javabean对象
+	1.使用注解来代替xml配置文件，但需要为主配置文件导入新的dtd约束，步骤和spring01一样的但是spring_01导的bean，而spring_02导的是context,需要注意的是spring_01已经导入一个空的命名空间了，所以以后的命名空间都不能为空了。第二行的内容是最后一行去掉文件名称后的内容，然后第一行的内容是第二行的最后一个单词，以后也这样做。spring_02要导的是依赖文件下的context 4.2版本。
+	2.配置完xml文件，就可以使用注解了。
+		1.先配置xml文件：<context:component-scan base-package="">扫描指定包下的注解，这个包的子包也会扫描（就是项目结构中的包，别多想），先指定Bean包做测试。
+		2.注解注册对象的四种方式：注册对象一共有四种方式分别是Component（可以添加对象名）、Service、Cotroller、Repository（仓库），功能没什么区别，只是后三种分别代表service层、web层、dao层。获取相同的两个user对象，判断是否相等，单例的话是相等的。
+		3.@Value赋值的两种方式：一是在属性变量上赋值,这种是通过反射的Filed字段赋值；二是在set方法上赋值，这种是通过调用set方法赋值。默认是使用set方法赋值，属性变量的赋值破坏了封装的特性。
+		4.装配对象的属性的两种方式：一是.自动加载@Autowired,也是可以设置在属性变量上和set方法上。（这个方法有个缺点，就是对象假如有多个值的话，将无法选择，但是可以加一个@Qualifier("car2")来选择）；方法二是.手动加载@Resource(name="car2")
+		5.注解配置init、destory方法。在User中的init和destory方法中配置，@PostConstruct初始化、@ProDestory销毁，但是需要注意的是如果对象作用域范围不设置成单例，则销毁方法无效
+	3.junit测试：
+		1.导包4+2+aop+test
+		2.在类上书写@RunWith(SpringJUnit4ClassRunner.class) 这个注解由junit提供，他会自动帮我们创建spring容器，还需要指定配置文件的位置@ContextConfiguration("classpath:applicationContext.xml"),此外还需要一个user对象，可以创建一个属性，然后使用@Resoure注入对象,测试
+	4.aop：
+		1.思想介绍：面向切面，横向抽取纵向重复的功能（比如filter）
+		2.spring AOP：spring能够为我们为我们生成代理对象，不需要调用Proxy.newProxyInstance(xx,xx,xx)
+		3.spring aop 原理
+			1.普通动态代理：被代理对象必须要实现接口，才能产生代理对象，如果没有接口将不能使用动态代理
+			2.cglib:可以对任何类生成代理，代理的原理是对目标对象进行继承代理，如果目标对象被final修饰，那么该类无法被cglib代理
+		4.代码实现：写一个service接口,写一个serviceImpl类，写一个UserServiceProxyFactory类，测试 。动态代理是代理对象和被代理对象实现相同的接口，cglib是继承
+		5.aop名词
+			1.通知/增强：增强的功能
+				1.前置通知
+				2.发生异常不调用后置通知
+				3.环绕通知
+				4.异常拦截通知
+				5.发生异常也调用后置通知
+			2.连接点：通知可以使用的地方，方法的前前后后，包括异常
+			3.切入点：如果方法多了，连接点也多了，切入点就是指定我们要使用连接点作用的方法
+			4.目标对象：要被通知通知（增强）的对象
+			5.切面：通知和切入点的结合就是一个切面
+			5.织入：把切面应用到目标对象来创建新的代理对象的过程，三种方式
+			6.代理：将通知织入到目标对象之后，形成代理对象 （使用的时候）
+	5.aop实现：
+		1.导包 2个spring的aop包、2个第三方的aop包
+		2.准备目标对象
+		3.准备通知
+			1.配置新建一个springaop包
+			2.里面有一个MyAdvice类
+		4.配置进行织入，将通知织入目标对象中
+			1.导入新的aop约束dtd,之前的步骤
+			2.配置目标对象
+			3.配置通知对象
+			4.通过配置将通知织入目标对象<aop-config>-<aop:poincut>演化-<aop:sapect>-<aop:before>
+			5.修改junit测试类中的配置文件、代理对象，然后测试
+	6.aop注解配置
+		1.导包 2个spring的aop包、2个第三方的aop包
+		2.准备目标对象
+		3.准备通知
+		4.新建包演示注解aop，复制一个配置文件和MyAdvice，配置 修改配置里的类名 <aop:aspectj-autoproxy>
+		5.实现类前@Aspect表示通知类，@Before("切点表达式")，@After...5个

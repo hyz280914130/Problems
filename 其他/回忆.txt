@@ -1,0 +1,53 @@
+1.JDBC:最原始的6个步骤
+	有个执行平台的区别就是createStatement()、prepareStatement(sql),第一个是个容器，把sql语句存进去，然后发送，第二个是预编译,就是会先把sql语句编译
+
+2.Dom4j 解析xml的6个步骤
+	获取解析器 读xml文件 获得根元素
+
+3.dtd和xml的关系
+	* ？ + 默认
+
+4.解析器和反射 invoke(对象，参数)
+
+5.tomcat
+
+6.servlet
+
+7.response
+
+8.response
+
+9.el jstl
+
+10.事务
+
+11.基础增强、redis、linux
+
+重点 ： 如何搭建
+
+12.	hibernate主配置文件如何配置
+	bibernate orm元数据如何配置
+	sql99：标准 三种操作语言 DDL DCL DML
+	自动建表的四种方式：
+	隔离级别的四种
+	主键生成策略（7）
+	方言的配置
+
+
+13.	hibernate对象的三种状态
+
+
+14.	事务的四种特性
+	
+
+14	三种的区别 list set map
+
+15	关系的维护
+
+16	级联操作
+
+	struts2 ation执行过程
+
+	继承包有什么用
+
+17	jsp忘记

@@ -1,0 +1,21 @@
+1.当要吧从前端获取的数据使用BeanUtils.populate()封装到javabean时，有些从前端获取的数据并不会自动转换，比如日期，浏览器传过来的是string类型，而javabean中是data类型，所以此时需要使用到ConvertUtils转换器的register()方法，他会在使用BeanUtils.populate()时自动调用。
+
+2.MainUtils：邮箱工具，用于向用户发送消息，这个工具类有两个参数，分别是发送对象的邮箱email、发送的消息。
+	首先要通过Properties方法设置MailUtils的配置信息
+	然后创建验证器
+	创建会话对象session，传入配置信息对象和验证器
+	创建一个message容器，存放session会话对象
+	设置message
+	发送message
+
+3.redis工具类
+	创建JedisPoolConfig对象，对Jedis设置参数
+	创建JedisPool对象，传配置对象，地址，端口
+	静态方法getJedis() --- pool.getResource()
+	写close方法
+
+4.json
+	使用Gson，gosn.toJson()，可以把一个对象转为json格式，然后写入redis
+
+5.商品历史纪录的实现
+	每次访问的商品详情页都获取该商品pid，拼串为一个string字符串，然后存入cookie，显示历史记录的方法体里边使用split方法解串，然后可以得到一个解串后的数组，遍历这个数组访问数据库来获取商品信息，把商品信息存放一个集合里，然后放到request域中，转发给jsp

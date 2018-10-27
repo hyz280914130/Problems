@@ -1,0 +1,32 @@
+项目总结：
+	1.搭建环境：
+		导包、创建三层架构的package、导入c3p0配置文件并修改、导入工具类、导入页面、准备实体类
+	2.编写注册页面：
+		1.首先修改register.jsp中的页面，给form表单中的input添加属性name,设置表单提交的路径和方式
+		2.创建RegisterServlet，获取表单的数据，封装到User（不要忘了有些要自己封装），经过service层传递给dao，保存用户提交的信息
+		3.保存完毕之后，利用MailUtils工具类给用户发送邮件，邮件的内容是包含验证码（封装到User保存到数据库code）的连接，用户点击连接会访问Action类，
+由Action类根据uuid进行判断是数据库中对应的那个用户，并将其state置为1，这样代表激活成功，跳转到登陆页面
+		3.登陆页面的操作，在login.jsp表单中添加name属性，提交路径和方式，数据会提交到LoginServlet，在LoginServlet这个类中接收请求的数据，然后封装到user，传递给dao层查询，如果查询到响应的用户那么跳转到登陆页面，否则跳转到登陆页面返回错误信息
+		4.功能完善：
+			1.$.validate.addMethod()添加自定义的校验方法，里面写$.ajax()异步查询用户名是否存在
+			2.利用CheckImg类，完善验证码验证，需要把图片的路径设置为checkImg
+		5.目前存在的问题：
+			1.validate和ajax不起作用
+			2.验证码点击希望可以换一张
+			3.需要用户到邮箱验证要告诉用户
+			4.忘记如何向前台传错误信息了
+	3.首页动态显示数据
+		1.首页热门商品和最新商品，首先要准备数据，实体包（商品），查询热门商品、准备最新商品，数据库查询返回的是集合，将数据存到request中传递给index.jsp，在jsp中导入jstl的标签，然后修改页面的图片显示，不能直接访问index.jsp，因为会加载不出数据，所以我们要修改welcome-file，创建一个default的jsp页面，里面直接重定向到indexServlet，这样就可以了
+		2.页面使用ajax显示类别菜单，准备类别实体包，dao层查询类别，web层返回查询到的集合，交给header.jsp显示，但是这儿有一个问题，只有index会显示分类的数据，其他地方不会，这是因为其他页面没有indexServlet传过来的参数，所以使用ajax异步加载数据，重写一个显示类别的Servlet，然后获取商品的类别数据，使用gson传回数据，在ajax中接收到数据以后遍历，将我们要的pname添加到ul中。
+		3.使用redis缓存显示类别菜单，导入redis的jar包， 导入之前学习时准备的redis配置文件，和redis工具类，然后在categoryServlet中向redis中存入数据，向redis中存入数据，判断redis数据库里是否为空，如果为空则从数据库中获取
+		4.分页显示某种某类别的商品表，在header中修改导航栏跳转到ProductByCidServlet，根据每一个商品的cid决定product_list显示的数据,封装一个pageBean，里面保存有关页面得信息，然后把需要得交给dao层查询，返回给product_list.jsp页面，修改jsp页面中的上一页，下一页，后一页，地址中传过去cid和当前页的值，但是不能传pageBean中的cid，要在ProductByCidServlet中向request域中存入cid。
+		5.显示商品的详细信息，在product_list中的商品详细信息连接编写提交请求的Servlet地址，然后在productInfoServlet中获取商品的pid，根据Pid查询详细信息，返回给页面显示，还要添加一个返回上一页的连接，但是我们无法直接获取上一页的cid和currentPage，所以我们要在product_list把请求提交给productInfo的时候一并传过去，这样就可以在product_info.jsp页面中获取了
+		6.浏览历史记录分析，每次访问详细信息都会记录下信息，然后传递给商品页的浏览记录信息显示，具体过程是这样的：
+			1.在ProductInfoServlet操作，再转发之前创建一个pids的字符串，把当前访问的pid赋值给他，然后获得cookies，if判断是否为空，当然第一次是为空的，所以会直接跳过循环执行下面的创造一个名为pids的cookie的代码，此时cookie是被赋予了一个值的，然后返回上一页页面就会带有cookie了，第二次访问商品的详细信息又会进来，此时有cookie了，所以执行if循环，进入里面，判断是否为pids的cookie，是，继续执行，先获取cookie的值，然后将cookie的值拆解成一个数组（“-”），之后组装成一个List，然后再将这个数组转为LikedList集合，判断这个集合中是否存在当前商品的pid（是否重复），如果重复删除掉并重新插入到最前面，之后在重新转为字符串，创建新的cookie以覆盖之前的。
+			2.在ProductByCid操作，从上一步返回后，页面已经带有pid的cookie了，要做的是接收它并查询相关的产品显示到历史记录，首先定义一个记录历史信息的List集合，里面存放的是product对象，然后获取cookies，判断是否名为pids，操作和上一步一样，不过在这不需要在封装成字符串了，只需要拆解成一个数组，然后遍历获取pid的值，查询数据库即可。把查到的信息放到域中，给页面显示。
+	4.servlet功能抽取
+		1.目前只涉及到用户和产品的功能，所以抽取到两个servlet中，一个User一个Servlet，需要把之前的路径全改掉，然后改配置文件，在doget中写一串代码，用来判断jsp页面中传过来的请求参数中的method，然后根据这个method字符串来判断调用那个方法。
+		2.进一步抽取上一步，第一步用if else判断是那个方法的代码重复率高，把product和user的doget、dopos都删掉，写一个BaseServlet，里面有servive（），让product和user和继承它，然后在BaseServlet中用反射来执行对应的方法，有一个需要注意的点，就是BaseServlet中的this（this的含义是代表当前对象），不是它这个类的this，因为BaseServlet没有直接被访问，它是由product和user被动的访问，这个this代表的是他们两个的对象。注意要改作用范围的修饰符
+	5.购物车分析：
+		
+		

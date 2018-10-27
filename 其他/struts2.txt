@@ -1,0 +1,100 @@
+servlet和struts1都有线程不安全的特性
+struts2是基于filter
+
+action 相当于servlet 处理请求类
+
+把strutsPrepareAndExecuteFilter 看成一个酒店，请求就相当于客人，进来酒店然后由ActionMaper(服务员)判断要访问的资源，返回给酒店一个ActionMapper对象 ，酒店在把这个ActionMapping提交给ActionProxy（老板），然后老板通过ConfigurationManager读取配置文件，知道struts2后台都有哪些包，哪些Action，然后老板就知道要读那个Action,把要执行的action交给ActionInvocation 除此之外还给它一个Interceptors集合
+,Interceptor代表拦截器，在执行到action之前，已经经过了20个拦截器，也就是说已经封装好了20个功能，然后执行Action方法，  Action返回一个字符串,Result封装这个字符串，然后根据封装的这个字符串查找配置信息，然后找到对应的jsp，jsp里执行脚本之后，然后在进行拦截器的后处理方法，最后响应
+拦截器不是固定的 可以删除 也可以自定义添加
+
+aop 面向切面编程
+
+struts2中action及其属性会被包装成actionContext，在actionContext中有request、session等各个域，action中的属性会同步到request中，也就是放到了request作用域中，所以el表达式也可以取出。
+
+Ognl.getValue("user1.name='xxx',#user1.name",oc,oc.getRoot)
+这个方法的第一个参数：
+这个表达式可以赋值，但取值的话只能取第一个参数的的最后一个
+#从context 中取值
+可以调用User的get方法
+@调用的xxx类（可以理解成微博的@,呼叫xxx），在一个@调用方法
+{}创建root
+#{}创建map
+
+OGNLContext在strust2中就是valuestack值栈
+root是栈，
+Context ActionContext数据中心是一个大Map，和threadlocal绑定 ，
+
+制作一个最简单的栈
+list.add(index,obj) 把第index+1个以及第index+1个以后的元素都往后移一位，然后再把obj放到index的位置
+
+参数接受 八大类型的转换 date类型转换 其实都是ognl表达式的作用
+
+valueStack 放在ActionContext里边，反过来ActionContext又做作为ValueStack的Context属性，总结就是他俩相互引用
+
+获得参数 属性 对象 模型
+模型 需要在赋值前 把对象压进栈中 赋值前的意思就是说action执行之前，说的更准确一点就是params拦截器之前，拦截器中有一个prepare准备拦截器 根据拦截器的源码得知 可以让aciton实现Preparable接口，获得prepare方法，在里面压栈
+
+想要在get提交一样在地址后面传一个参数 可以在xml中用ognl表达式 ${}
+
+ctrl shift t : 查看源码 
+
+Strust访问流程源码
+request.Attribute被包装过：所以jsp中er取资源时查找顺序，他有自己的查找顺序 原生的request域 -- valueStack root 部分 --- valueStack context部分
+
+前actionMapping ： 分析请求的信息 包 命名空间 。。。 
+后actionMapping ： 提取命名空间、提取action名称、提取方法
+老板得到这些信息 ， 然后封装成小秘对象 ， 小秘进行处理
+用一个类似递归的方法遍历20个默认的拦截器：invocation的invock方法调用interceptor1，interceptor1再去调用invocation的invoke，然后interception再去调用下一个拦截器的interception2方法...当所有的拦截器调用结束，然后执行action，返回一个字符串，交给result调用，result调用之后转发或者重定向到jsp，如果在invocation的invoke方法后面还有方法，那就继续执行（就是上面那种方式在递归一边）
+
+先熟练api，在研究思想（在研究源码、设计模式。。）
+<s:debug >是查看valueStack的信息
+
+<s:iterator value="#list" > ... </s:iterator>
+这个是strust2 自己的标签库 作用和jstl中的<c:forEach item="${list}" var="xxx">一样,它遍历actioncontext中list这个集合，然后执行标签体，每次遍历都会把list中的元素压到值栈的栈顶，这个标签里面有一个<s:property value="cust_level">，这是ognl表达式的取值，从栈顶取 如果用一个var="cust" ,那就是往actioncontext中放的那个键，取值就变成<s:property value="#cust.cust_level">
+
+拦截器的生命周期有两种：一次请求和整个项目。但是常用的是整个项目的生命周期，为什么呢？假如是一次请求的话，那么就没不要特意抽取出来了，直接在实现代码中完成。还有就是假如有多个用户同时访问，那么岂不是要创建很多拦截器？明显不合理
+interseption 常驻内部 action每次请求都创建一个
+
+拦截器有两种创建方式 ： 1 实现 即使不需要也要实现init和destroy方法，不好用直接放弃 2 继承AbstractInterceptor（也不推荐） 3 继承 mythodfilterinterption  可以定制拦截器的拦截方法，定制那些方法需要拦截，或者那些方法不需要拦截 有些方法需要登陆用户的验证，比如修改用户就需要先登陆，这种需要拦截器实现验证是否登陆，但不是所有的方法都需要验证。比如注册，假如都还没注册用户怎么登陆，这种就不应该拦截，不然就陷入一个死循环
+拦截器的逻辑放在interception方法（那些需要拦截、那些不需要拦截），当需要拦截的时候就调用dointerception
+拦截器有前处理和后处理，前处理在invoke之前，后处理在invoke之后
+invoke调用intercepton拦截器，执行必要代码后进入if语句判断是否还有拦截器，会返回一个resultCode字符串，而最后一个字符串由invoke返回，在进入if判断没有字符串了，代表此时没有拦截器可以调用了，进入ifelse{resultCode = invokeActionOnly} 表示开始执行Action   // 这个字符串是struts2 定义的字符串常量 success之类的，代表结果，在配置文件中表示执行那个文件那个。也就是说如果你不打算放行，那么就返回一个字符串，系统就不会递归了，会跳转到一个你指定的页面
+
+一般xml的配置文件，不记得或者忘记的要学会去抄 在struts2-core-xxx.jar\struts-default.xml，自己写配置信息的时候要记得查看提示，不要写错了位置等等。。
+jar里面封装的是jar和api war里面封装的是整个web应用，放到tomcat webapps文件夹下会自动解压
+struts-default.xml 里面封装了struts默认的20个拦截器栈 还配置了一个默认的拦截器引用，引用的就是这个默认拦截器栈
+
+综上所述：配置拦截器一共有三个步骤：1.注册拦截器 2.注册拦截器栈 3.指定默认拦截器
+注册拦截器栈的时候需要引入系统默认的拦截器栈，不然那20个拦截器就没了，然后在引入你自己的，自己定义的拦截器建议放在引入的默认的拦截器之前，这样有个好处，比如0个拦截器中有处理异常的拦截器，假如你在自己定义的拦截器中添加了异常信息，那么后面异常处理的拦截器就会帮你处理，但是你放后面就不行了。其实也不是一定要放在最前面。刚入们建议放在最前面，当后期对这20个拦截器理解了之后，可以自己配置拦截器的顺序。
+其实你如果希望自己的这个目标acton走自定义的拦截器栈，而其他的action都走struts2的默认拦截器栈，那么你可以在xml action标签中定义默认的拦截器栈，这样就代表只有这个action走这个拦截器栈
+如果希望这个包都走那么就在包的标签下配置默认拦截器栈
+
+指定那些方法不拦截 ：在自定义拦截器下<param name="excludeMethods">xx1,xx2</param> xx1,xx2不拦截
+指定那些方法不拦截 ：把name改成"incldueMethod" 
+注意上面两种方法只能选择一个使用，name这样配置实际上是在走MethodFilterIntercrptor的setExcldueMethod（String） 和 setIncldueMethod（String）方法
+
+写好拦截器之后会返回一个结果的字符串，但是在配置结果集的时候怎么配置，因为之前结果集是配置在每个action中的，如果配置给action1,那么运行到action2时 它返回的结果集该去哪找？ 所以引入一个新的配置，全局结果集配置<global-result>
+配置的顺序有严格的要求，设置默认的action在最前面，其次是设置默认的class,最后是globle-results
+
+拦截器控制不了jsp的请求，把所有页面都通过action跳转
+
+
+客户管理系统 在写了拦截器之后，如果访问联系人列表，那么跳转登陆界面，但不是重开一个页面而是在那个frame框架内显示了一个登陆界面。解决这个办法
+window.onload = function(）{
+	if(window.parent! = window){
+		window.parent.location.href = "${pageContext.request.contextPath}/login.jsp";
+	}
+}
+window.parent是副窗口的意思
+
+execute()方法特征：	
+	修饰符为public
+	返回一个字符串，指示下一个页面的Result
+	方法没有参数
+满足上面的pojo
+
+pojo：简单的Java对象 -- 其中有一些属性及其getter setter方法的类
+
+
+
+

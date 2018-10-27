@@ -1,0 +1,14 @@
+
+1.转发地址写错
+
+2.查询才需要BeanListHandler这些东西
+
+3.使用UUID，但是没检查数据库Pid的长度
+
+3.还不明白转发和重定向的地址是相对地址还是绝对地址
+	转发要加：request.getContextPath()；
+	重定向不加
+
+4.这个问题很纯啊！！！！！  浪费了我好久，要分清你查的是List<Product>还是Product!!!!!!!!!!!!!
+
+5.搭建struct2时，访问路径要加action，还有填写class时是路径是. 而且后面不能加java，在主struct2配置文件中引入其他配置文件则是/

@@ -1,0 +1,2 @@
+1.转发要加：request.getContextPath()；
+	重定向不加

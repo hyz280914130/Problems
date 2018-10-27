@@ -1,0 +1,3 @@
+classpathxmlapplicationcontext("applicationcontext.xml")
+context:component-scan
+context:component-scan

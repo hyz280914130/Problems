@@ -1,0 +1,77 @@
+一、hibernate_01
+	0.导包，创建配置文件，导入dtd
+	1.主配置文件怎么配  主配置文件和元数据配置文件的区别
+		数据库驱动
+		数据库url
+		数据库连接用户名
+		数据库连接密码
+		数据库方言
+		sql是否打印和格式化
+		自动更新表
+		引入元数据
+	2.元数据配置文件怎么配,标签都有那些属性
+		hibernate-mapping 的 package属性
+		class
+		id  native
+		property
+	3.hello
+		创建调用空参构造函数
+		读取主配置文件
+		如果主配置文件中没有配置元数据配置文件
+		创建session工厂
+		创建session对象
+		打开事务
+		操作数据库
+	
+	4.api
+		获得与线程绑定的session
+		getTransaction和beginTransaction的区别
+
+二、hibernate_02
+	1.主键生成策略	identity sequence increment hilo native uuid assigned
+	2.对象的三种状态相互转换和方法使用
+	3.证明一级缓存存在 测试值会覆盖 
+	4.普通session和与线程绑定的session
+	5.HQL
+		基本查询、条件查询、分页查询 想一想怎么写，分别用什么获得结果、设置参数
+	6.criteria
+		基本查询、条件查询 add-Restrictions、分页查询、查询总记录数setProjection-Projections
+	7.原生sql查询
+		基本查询1、基本查询2、条件查询、分页查询 addEntity
+三、hibernate_03
+	0.外键的维护是什么意思，一的一方能否维护多的一方，由此联想外键的配置
+	1.一对多的hibernate配置文件怎么配置，set怎么配置，级联cascade、和控制反转	
+	2.多对一的hibernate配置文件怎么配置
+	3.多对多的hibernate配置文件怎么配置（两个）、外键是怎么写的
+	4.保存客户以及客户下的联系人
+	5.为客户新增联系人
+	6.为客户删除联系人
+	7.为客户删除联系人
+	8.删除客户时删除客户下的所有联系人 级联delete
+	9.保存联系人以及联系人对应的客户 级联save-update
+	10.保存员工和角色
+	11.为何永正新增一个角色
+	12.为何永正解除一个角色
+四、hibernate_04
+	0.batch-size 一次抓取的数量
+	1.HQL
+		1.查询所有的表
+		2.排序
+		3.条件查询
+		4.分页查询
+		5.统计查询
+		6.投影查询
+	2.criteria
+		1.基本语法
+		2.条件查询
+		3.分页查询
+		4.排序查询 Order
+		5.统计查询
+	3.离线查询id为6的用户 DetachedCriteria
+	5.懒加载下get和load的区别
+	6.迫切和懒加载的组合使用 三种对三种
+	
+	
+		
+	
+	
