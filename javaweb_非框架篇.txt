@@ -1,0 +1,116 @@
+一、HTML
+
+  1.居中标记 : <capter></capter>，功能类似<div align="center">
+  
+  2.表格标题标记 : <caption></caption>
+  
+  3.<ol>和<ul> : ol是有序，ul是无序
+  
+  4.<form>表单标签target属性的四个取值 ： 
+    (1) _blank : 在新窗口打开
+    (2) _self : 在同一个窗口打开
+    (3) _parent : 在上一级窗口打开
+    (4) _top : 在整个浏览器窗口打开
+    
+  5.<select>下拉列表框实现多选
+    添加属性multiple="multiple"
+    
+  6.<textarea> 多行文本标记标签
+    用于显示多行文本，可以设定行数和列数，还可以设定name属性，作为表单提交的其中一项，这里只说warp属性的两个属性
+     (1) warp="hard" : 自动换行，提交给服务器时换行符也同时被提交
+     (2) warp="soft" ： 自动换行，但提交给服务器时不添加换行符
+     (3) warp="off" : 不自动换行
+     
+   7.<table>子标签<th>、<tr>、<td>的valign属性 ： 表示垂直对齐，其middle值表示居中。
+   
+   8.<frameset>框架标签 : <frameset>通过行和列确定整体布局，使用<frame>来确定页面的位置，<frameste>可以嵌套使用
+   
+   9.<frame>框架子标签
+    (1) src : 页面的路径
+    (2) noresize : 分隔线不能移动
+    (3) name : 框架的name
+    (4) target : 通过name确定在何处显示
+     * <a>标签target属性也能跳到frame
+     
+   10.<form name="a"><input name="b" id="b" type="text"></form> 获取input的输出值 : a.b.value
+   
+ 二、HTML5
+ 
+  1.<section>元素 ： 翻译为部分，表示页面中的一个区域，类似与<div>
+  
+  2.<article>元素 ： 翻译为文章，表示页面中一块与上下文无关的区域，例如一篇文章。结合以下元素表示使用
+    (1) <herder> : 一个内容区域或者整个页面的标题
+    (2) <footer> : 一个内容区域或者整个页面的脚注
+    
+  3.<aside> : 表示当前页面或文章的附属信息部分
+  
+  4.<input>元素新增元素类型
+    (1) email
+    (2) url
+    (3) number
+    (4) range : 表示必须输入一定范围内数值的文本框
+    
+  三、CSS
+  
+    1.CSS选择器
+      (1) 元素选择器
+      (2) id选择器
+      (3) 类选择器
+      (4) 属性选择器 ： 标签名 [标签属性 = 标签属性值] { .. }
+      (5) 包含选择器 ： 父标签 后代标签 { .. }
+      
+  四、JavaScript
+  
+    1.特点 ： 解释性、基于对象、事件驱动、安全性、跨平台
+    
+    2.语法 ： 和java类似，不过变量是弱类型
+    
+    3.关键字 ： 关键字很多，要注意关键字不能用作变量名、函数名、循环标签
+    
+    4.空值和为定义值 ： 
+      (1) 空值代表定义空的或者不存在的引用，它不能于空的字符串或0
+      (2) 未定义值 ： 表示已经声明，但没有赋值的变量
+      
+    5.函数的定义  ： 三种定义方式
+      (1) function fun(){}
+      (2) var a = function(){} ： 匿名函数
+      (3) var b = new function("a","b","return a+b");
+      
+    6.常用事件 ： onxxx（需要时查询）， 需要记住的是页面交互的实现是通过触发相关事件来实现
+    
+    7.windows对象 ： windows即代表浏览器窗口的对象，需要学习的是它的 “属性” 和 “方法” ，二者要区别开来，它们用于操作浏览器的内容，需要时查询使用。
+    
+    8.DOM : 它表示HTML的文档对象模型，HTML文档结构为DOM树，文档中的每个节点视为不同的Node对象
+      (1) Node对象的属性
+      (2) Node对象的节点类型、节点名、节点值、节点类型常量
+      (3) Node对象的常用方法 ： 这个是重点，常用的方法有
+        a. insertBefore(newChild,refChild) : 在现有节点refChild之前插入新节点newChild
+        b. replaceChild(newChild，oldChild) : 把子节点列表中的子节点oldChild换成newChild，并返回oldChild
+        c. removeChild(oldChild) ： 把子节点列表中的子节点oldChild，并返回oldChild
+        d. appendChild(newChild) : 将节点newChild添加到改节点的子节点列表末尾
+        e. hasChildNodes()
+      *具体可在看看《javaweb从入门到精通》p73，案例在p76
+      
+    五、JSP
+    
+     1.三大指令
+      (1) page指令 : 属性有 language、extends、import、pageEncode、contentType、session、buffer、autoFlush、isErrorPage、errorPage
+        a. pageEncode ：指定文件编码
+        b. contentType ： jsp页面的MIME类型和字符编码
+        c. buffer ： 设置out缓冲区大小
+      (2) include指令 ： 静态包含，同时编译两个文件，然后合并成一个，通过file属性引入包含文件。
+      (3) taglib指令 ： 声明该页面中使用的标签库，属性prefix表示前缀(任意名)，uri:引入的地址
+      
+      2.表达式
+        (1) 表达式1 ： <%= expression %>
+        (2) 表达式2 ： <%! 成员变量|成员方法 %>
+        (3) 表达式3 ： <% 代码 %>
+        
+      3.注释
+        (1) 方式1 ： //
+        (2) 方式2 ： /*
+        (3) 方式3 ： /**
+        (4) 方式4 ： <%-- 隐藏注释 --%>
+        
+      4.动作标签 
+        (1) <jsp:include page="url"> ：动态包含
