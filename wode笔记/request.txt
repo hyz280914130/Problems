@@ -1,0 +1,225 @@
+0.request.setAttribute(name,value)
+  request.getAttribute(name) 这儿需要强转，因为取得的值是一个Object类型的
+
+1.转发：servlet1向request域中存数据，forward(request,response)转发，servlet从request中取数据（也可以是jsp从里面取数据）
+	setAttribute()-->getAttribute()
+
+2.转发和重定向：
+
+3.注册乱码的过程：王五---使用UTF-8编码---使用ios8859-1解码---xxx
+  解决乱码(把上面过程逆向)：xxx---使用ios8859-1编码----使用UTF-8解码---王五
+		编码：str.getByte("ios8859-1")-->new String(bytes,"UTF-8")
+
+4.ServletContext域与Request域的生命周期比较
+	ServletContext:
+		创建：服务器启动
+		销毁：服务器关闭
+		域的作用范围：整个web应用
+	request:
+		创建：访问时创建request
+		销毁：响应结束时request销毁
+		域的作用范围：一次请求中
+
+5.转发与重定向的区别
+	（1）重定向两次请求，转发一次请求
+	（2）重定向地址栏的地址变化，转发地址不变
+	（3）重新定向可以访问外部网站，转发只能访问内部资源
+	（4）转发的性能要优于重定向
+
+6.客户端地址和服务器端地址的写法
+	客户端地址的：客户端地址去访问服务器的地址，服务器外部地址，特点：写上web应用名称
+	服务器端地址：服务器内部资源的跳转地址，特点：不需要写web应用的名称
+
+7.Map.Entry 是Map中的一个接口，他的用途是表示一个映射项（里面有Key和Value），而Set<Map.Entry<K,V>>表示一个映射项的Set。Map.Entry里有相应的getKey和getValue方法，即JavaBean，让我们能够从一个项中取出Key和Value。
+
+8.post提交和get提交的乱码解决方式不一样，不过一般在开发中绝大部分使用的是post提交。
+
+9.username = new String(username.getBytes("ios8859-1"),"UTF-8");（getBytes("ios8859-1")设置编码为ios8859-1,后面设置解码utf-8
+
+10.BeanUtils工作原理：将map中的数据 根据key与实体的属性的对应关系封装，只要key的名字与实体的属性 的名字一样 就自动封装到实体中
+
+11.BeanUtils.populate( Object bean, Map properties )，这个方法会遍历map<key, value>中的key，如果bean中有这个属性，就把这个key对应的value值赋给bean的属性。
+
+12.user.setUid(UUID.randomUUID().toString()); 随机产生一个不重复字符串，但是uid这个字段在数据库里的长度必须大于等于36，随机的字符串32位，但是因为他会自动创建四个“-”，又占了4位，所以实际上我们要说uid只有32位，不能算四个“-”。
+
+13.调用方法时要注意是Request的还是Response的，比如 setCharacterEncoding
+
+14.写了设置字符集格式之后传到数据库里的值还是？，原因是数据库的解码并不是UTF-8,在C3P0里改设置 jdbc:mysql://localhost:3306/user?useUnicode=true&amp;characterEncoding=UTF-8，然后又发现需要转移&amp，不仅如此，转义之后还得加“；”
+
+15.在登陆实例中，如果用户名或密码出错，是需要向页面传送消息的，在jsp中这样写：
+	<div><%=request.getAttribute("loginInfo")==null?"":request.getAttribute("loginInfo")%></div>，使用三元运算符，如果没有消息代表对应的用户名错误方法没执行，给页面写一个空字符串；如果有消息，则写入
+
+16.login = login(username,password);这一步忘记重新给login赋值了 ，我以为赋回来的值必须是正确的username和password，但其实只要不为空就行了。
+
+
+
+
+
+		request知识总结
+
+0、这部分内容也将分为请求行、请求头、请求消息体、域四部分总结
+
+1、请求行相关方法：
+	比较重要：
+	String getMethod()：用于获取HTTP请求消息中的请求方法
+		--- GET/POST
+	String getContextPath()：获取请求行URL中属于WEB应用程序的路径
+		--- /Study_request
+	String getLocalAddr()：获取Web服务器上接受当前请求网络连接的IP地址
+		--- 0:0:0:0:0:0:0:1
+----------------------------------------------------------------------------------
+	String getRequestURI()：获取请求行中资源名称部分，URL的主机和端口之后，参数部分之前。
+		--- /Study_request/RequestServlet
+	StringBuffer getRequestURL()：用于获取客户端发出请求时的完整URL
+		--- http://localhost:8080/Study_request/RequestServlet
+	String getQueryString()：用于获取请求行中的参数部分，也就是资源路径后面（？）以后的所有内容
+		--- NULL(GET方式)
+	String getProtocol()：用于获取请求行中的协议名和版本
+		--- HTTP/1.1
+	String getServletPath()：获取Servlet的名称或Servlet所映射的路径
+		--- /RequestServlet
+	String getRemoteAddr()：获取请求客户端的IP
+		--- 0:0:0:0:0:0:0:1
+	String getRemoteHost()：获取请求客户端的完整主机名
+		--- 0:0:0:0:0:0:0:1
+	String getLocalName()：获取Web服务器上接受当前网络连接IP所对应的主机名
+		--- 0:0:0:0:0:0:0:1
+	int getRemotePort()：获取请求客户端网络连接的端口号
+		--- 14847
+	int getLocalPort()：获取Web服务器上接收当前网络连接的端口号
+		--- 8080
+	String getServerName()：获取当前请求所指向的主机名
+	int getServerPort()：获取当前请求所连接的服务器端口号
+		--- localhost
+	String getScheme()：获取请求的协议
+		--- http
+
+2、消息头的相关方法：
+	String getHeader(String name)：获取一个指定头字段的值
+	Enumeration getHeaders(String name)：返回一个Enumeration集合对象，该集合对象由请求消息中出现的某个指定名称的所有头字段值
+	Enumeration getHeadersNames()：获取一个包含所有请求头字段的Enumeration集合对象
+	int getIntHeader(String name)：获取指定名称的头字段，并且将其值转为int类型
+	Long getDateHeader(String name)：获取指定头字段的值，并将其按GMT时间格式转换成一个代表日期/时间的长整数。
+	String getContentType：获取Content-Type头字段的值，结果为String类型
+	int getContentLength()：获取Content-Length头字段的值，结果为int类型
+	String getCharacterEncoding()：返回请求消息的实体部分的字符集编码，通常是从Content-Type头字段中进行提取，结果为String类型。
+	
+3、消息体的相关方法
+	String getParameter(String name)：获取某个指定名称的参数值
+	String[] getparameterValues(String name)：获取HTTP请求消息中同一个参数名所对应的所有参数值。
+	Enumeration getParameterNames()：返回一个包含请求消息中所有参数名的Enumeration对象，再次基础上，可以对消息体中的所有参数进行遍历处理
+	Map getParameterMap：将所有请求消息中的所有参数名和值装入进一个Map对象中返回
+
+4、request域
+	setAttribute(String name,Object o)：将一个对象与一个名称关联后存储进ServletRequest对象（域）中
+	getAttribute(String name)：从ServletRequest对象（域）中返回指定名称的属性对象
+	removeAttribute()：从ServletRequest对象（域）中删除指定名称的属性
+	getAtrributeNames()：返回一个包含ServletRequest对象中的所有属性名的Enumeration对象，再次基础上，可以对ServletRequest对象中的所有属性进行遍历。
+
+5.RequestDispatcher接口
+	getRequestDispatcher(String path)：返回封装了某个路径所指定资源的RequestDispatcher对象。其中，参数path必须以“/”开头，用于便是当前web应用的根目录。需要注意的是，WEB-INF目录中的内容对RequestDispatcher对象也是可见的。
+	forward(ServletRequest request,ServletResponse response)：该方法用于将请求从一个Servlet传递给另一个Web资源。该方法必须在响应提交给客户端之前被调用。
+	include(ServletRequest request,ServletResponse response)用于将其他的资源作为当前响应内容包含进来
+
+
+
+
+
+
+		实例步骤总结：
+	首先需要导包还有工具类以及c3p0配置
+1.请求行：
+	request.getMethod();--- 获得请求方式
+	request.getRequestURL();--- 获得请求资源的相关内容
+	request.getRequestURI();--- 获得请求资源的相关内容
+	request.getContextPath;--- 获得应用名称
+	request.getQueryString();--- 地址后参数的字符串
+	request.getRemoteAddr();--- 访问者的地址
+
+2.请求头：
+	1）request.getHeader();--- 根据头name获取头字段的值
+	     request.getHeaderNames();--- 获得所有头名称，这是一个集合
+		然后遍历集合：headerNames.hasMoreElements()
+			      request.getHeader(headerName);
+	2）对网站的来源进行判断
+		request.getHeader("referer");
+		if(header!=null&&header.startsWith("http://localhost")判断这个网站的来源是否属于本服务器
+
+2.请求体：
+	1）获得表单中单个值
+		request.getParameter("username");
+		request.getParameter("password");
+	2)获得表单中多个值
+		request.getParameterValues("hobby");
+		遍历
+		for(String hobby:hobbys){}
+	3）获得所有请求参数的名称
+		request.getParameterNames();
+		遍历
+		while(parameterNames.hasMoreElements()){}
+	4)获得所有的参数
+		request.getParameterMap();
+		for(Map.Entry<String,String[]> entry:parameterMap.entrySet())
+		{	for(String value:entry.getValue())	}
+		
+		entrySet():获得映射关系
+		entry.getKey()：获得键。因为参数以键值的形式存在。
+
+3.转发：
+	1）像request域中存对象
+		request.setAttribute("name","tom");
+	2）servlet1将请求转发给servlet2
+		request.getRequestDispatcher("/servlet2")
+	3）执行转发
+		requestDispatcher.forward(request,response);
+	4）从request域中取出内容
+		request.getAttribute("name");
+	5)输出取得的内容
+		response.getWriter().write(value);
+
+4.注册
+	1)使用BeanUtils进行自动封装
+		request.getParameterMap();
+		User user = new User();
+		BeanUtil.populate(user,parameterMap);
+	
+	2)将参数传给业务处理
+		regist(user);
+	3)regist方法内部：
+		QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+		qr.update(sql,user.getUid(),user.getUsername(),user.getPassword(),user.getName(),user.getEmail(),user.getBirthday(),user.getSex())
+
+5.登陆
+	1）获取值
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		User login = new User();
+		BeanUtils.populate(login,parameterMap());
+	2）调用业务层,用一个变量存储返回的值
+		login = login(username,password);
+		2.1）业务层的方法
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			User user = qr.query(sql, new BeanHandler<User>(User.class),username,password);
+			return user；
+	3）判断
+		成功就跳转
+		if(login!=null) {response.sendRedirect(request.getContextPath());}
+		不成功就先向域中存错误数据（写给jsp），然后返回登陆界面
+		request.setAttribute("loginInfo", "用户名或密码错误");
+		request.getRequestDispatcher("/login.jsp").forward(request, response);
+
+
+
+
+
+
+			其他
+1.突然产生了request为什么是一个域的问题
+	个人看法：request的生命周期虽然是一个请求内，但是在这个请求内可能会经历许多servlet（比如转发），那么这个时候就需要一个区域来存储转发的内容了，如果使用servletContext，那么很明显任何servlet成员都可以参与到这个请求中，这明显不是我们期望的结果，因为这样的需求，所以就产生了request域。
+
+2.什么是一次请求
+	客户端连接服务器，发送一个完整的http报文，服务器收到请求，运行服务器程序，返回html代码作为结果的过程就是一次请求。
+		
+
+
+
+

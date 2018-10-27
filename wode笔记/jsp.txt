@@ -1,0 +1,89 @@
+
+		JSP经验总结
+
+1.jsp运行原理：首先服务器访问某个jsp文件，它会去tomcat容器的work文件夹下面找有没有相应的servlet java文件，如果有就直接用此java文件响应。如果没有就把这个jsp文件翻译成对应的java文件，然后在响应。
+	过程：JSP文件 转换成 Servlet文件(.java) 编译成 class文件(.class) 这个class文件就是一个servlet实例，服务器执行它并响应给客户端。
+
+2.jsp脚本和注释：
+	jsp脚本：1）<% java代码 %> --- 这个标签的java代码会翻译到service方法的内部
+		 2）<%=java变量或表达式> --- 这个标签里的内容会被翻译到service方法内部out.print()
+		 3）<%! java代码 %> --- 这个标签的内容会被翻译成servlet的成员（成员变量/成员方法）
+	jsp注释:三种注释，不同的注释可见范围不一样
+		 1）html注释 --- <!-- 注释内容 -->：可见范围是jsp源码、翻译后的servlet、html源码
+		 2）java注释 --- //单行注释 /*多行注释*/：可见范围是jsp源码、翻译后的servlet
+		 3）jsp注释 --- <%-- 注释内容 --%>： --- 可见范围是jsp源码
+
+3.三个jsp指令：一般指令的标签里都会带一个@
+	1）page指令：格式是 --- <%@ page 属性名1="属性值1" 属性名2="属性值2" ...%> , 根据不同的属性，指导整个页面特性，常用属性如下：
+		language：jsp脚本中可以嵌入的语言种类
+		pageEncoding:jsp这个文件本身的编码
+		contentType:页面的编码，如果不写就默认按照pageEncoding的编码格式
+		session:是否在jsp翻译时自动创建session
+		import：导入java的包
+		errorPage：如果当前页面出错后将跳转到那个页面
+		isErrorPage：表示当前页面是一个处理错误的页面，将获得一个Exception对象
+	2）include指令：静态包含指令，可以将一个jsp页面包含到另一个jsp页面中，格式：<%@ include file="被包含的文件地址"%>
+	   include指令活用：<%@ include file = "被包含的文件地址">，你可以把页面的头和尾做成单独做成jsp文件，然后通过引用的形式使用，这样你只需要完成内容部分就是一个完整的页面，这样做的好处是，当你需要改头和尾的某些地方时，就不需要每个页面都改动了，而且也可以减少你写代码。
+	3）taglib指令：在jsp页面中引入标签库（jtsl标签库、struts2标签库），格式：<%@ taglib uri="标签库地址" prefix="前缀"%>，前缀的作用是区分来自那个标签库的变迁
+								
+
+4.九大隐式对象：
+	PageContext pageContext; --- 里面维护着其他8大对象的引用，可以获得其他8大隐式对象
+	HttpSession session; --- 域，用来保存用户信息
+	Throwable exception; --- 表示JSP页面所发生的异常，在错误页中才起作用
+	ServletContext application; --- 所有用户的共享信息
+	ServletConfig config; --- 服务器配置，可以取得初始化参数
+	JspWriter out; --- 用于页面输出
+	Object page = this; page相当于this，是这个类的实例，封装这个类的内容
+	HttpServletRequest request; --- 得到用户请求信息
+	HttpServletResponse response; --- 服务器向客户端的回应信息
+	九大对象都要记住，可以这样记response、四个域（request 、session、application、pageContext）、一个异常（exception）、一个配置（config）、一个输出（out）、一个实例（page）
+
+	重点介绍两个对象：out对象、pageContext对象
+	（1）out对象：类型是JspWriter、作用是向客户端输出内容out.write、out缓冲区默认8kb 可以设置成0 代表关闭out缓冲区 内容直接写到respons缓冲器
+	（2）pageContext对象：jsp页面的上下文对象（page对象与pageContext对象不是一回事），作用如下：
+		1）pageContext是一个域对象：对应的也有三种方法 
+			setAttribute(String name,Object obj)
+			getAttribute(String name)
+			removeAttrbute(String name)
+		但不同的是，pageContext可以向指定的其他域中存取数据
+			setAttribute(String name,Object obj,int scope)
+			getAttribute(String name,int scope)
+			removeAttrbute(String name,int scope)
+			findAttribute(String name)
+		fingAttribute()虽然可以根据属性名取得值，但是是从小到大的域开始取值
+		依次从pageContext域，request域，session域，application域中获取属性，在某个域中获取后将不在向后寻找
+		2）可以获得其他8大隐式对象
+
+5.jsp标签
+	1）动态页面包含：<jsp:include page="被包含的页面">
+	2）请求转发：<jsp:forward page="要转发的资源">
+
+6.静态包含与动态包含的区别：
+	静态包含标签：被引入文件除了指令元素外，其他元素都会被转成响应的Java源代码，然后插入进当前jsp页面所翻译成的servlet源文件中，插入位置与include指令在原jsp页面中的位置保持一致，web容器执行一个文件。
+	动态包含指令：当浏览器第一次请求一个使用<jsp:include>标签的页面时，web容器首先会编译被包含的页面，然后当该动作标签编译后，jsp程序会将请求转发到被包含页面，并将执行结果输出到浏览器中，然后返回页面继续执行后面的代码，web容器执行两个文件。被包含的页面不能改变响应状态码或者设置响应头，而include指令没有这方面的限制。
+	动态引入的资源和当前jsp页面是两个彼此独立的执行实体，及动态引入的资源必须能够被web容器独立执行，且在运行时才包含。而静态指令只能引入遵循jsp格式的文件，被引入文件与当前jsp文件需要共同合并才能翻译成一个servlet源文件，在编译时包含。	
+
+
+7.四大域总结：
+	pageContext域：当前jsp页面请求
+	request域：一次请求
+	session域：一次会话
+	application域：整个web应用
+
+jsp四种输出方式:
+	1）直接通过HTML输出：aaa
+	2）out.writr("bbb")
+	3）response.writer().write("ccc")
+	4）<%="ddd">
+	最终输出到页面的结果为 ccc、aaa、bbb、ddd。这是因为1 2 4三种输出在转换时都会自动翻译成out.write（）输出方式，而out有个默认的8KB缓冲区，这三种方式的输出都是先写到out缓冲区里面。3这种方式则是写到response缓冲区里，因为最终服务器（tomcat引擎）是从response缓冲区里面取内容响应给浏览器，所以实际上还要把out缓冲区里面的内容写到response缓冲区里，这样才导致最终的输出顺序是3 1 2 4。还有一点就是可以把out的缓冲区大小设置为0（buffer=0kb），这样就相当于关闭out缓冲区，然后这四种输出方式都会自动往response里写，这是的输出顺序就是1 2 3 4了。
+	顺便一提System.out.print()这是输出方式是输出到控制台
+
+
+
+
+
+			实例总结
+
+1.servlet和jsp
+	servlet负责编写java代码，jsp负责页面输出，那么servlet如何将从数据库中获得的商品数据交给jsp输出呢？ --- 答案是：用request域，比如从request域中获得一个Product的List<Product>集合，存入request域中，然后给jsp输出

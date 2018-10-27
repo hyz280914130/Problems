@@ -1,0 +1,126 @@
+			response总结
+
+	细节点总结：
+
+1.一般小的对象可以拿到大的引用
+
+2.重定向：客户端访问服务器寻求资源，一开始向servlet1发起请求。但被告知资源在servlet2哪儿，然后服务器会返回给客户端这个结果。之后客户端自动向服务器发起二次访问（请求），向servlet2请求资源。
+	特点：（1）第一次访问是手动的，第二次是客户端自发的。（访问服务器两次）
+	      （2）地址发生改变。
+
+3.刨析 客户端<-->服务器 请求、响应的过程：首先客户端向服务器发起请求，tomcat引擎接受这个请求。tomcat引擎根据请求行中的地址分析出要请求的哪个资源（servlet），与此同时创建出request、response对象。此时request包含（封装）所有请求的内容（请求行、请求头、请求体），但response还是空对象，然后把request、response对象传到servlet中的doGet方法作为参数。在方法体中通过response调用各种方法向response缓冲区中（先这么抽象理解）写入内容，等doGet方法执行结束，tomcat引擎会取出所有缓冲区的内容组装成一个完整的响应内容（即使你方法体中没有写完全部的响应内容，封装后也会完善，也就是说封装后包含完整的响应行、响应头、响应体），之后服务器将这个封装好的响应体返回给客户端，客户端接受到的这个响应体只是一串代码，解析之后获得其中的响应体，并显示（解析->渲染->显示)    渲染：比如向客户端传一张图片，在响应内容中可能是串字符，要把它渲染成原来的那张图片。       -----------很重要！
+
+4.response细节点：（1）response获得的流不需要我们手动关闭，Tomacat服务器会帮助我们关闭。
+		  （2）getWriter和getOutputStream 不能同时调用。
+ 		  （3）一般重定向和转发后面不写代码--------response.sendRedirect(location)
+
+5.js补充知识点：在onload(){}函数里面写一个function(){}函数，这个函数是私有的，外部访问不到。其实之前在做表单验证的时候也已经尝试过了，我把所有的验证函数放到了onload(){}里面，希望它能返回一个集合与的值，但是失败了，原因就是放到里面的函数就变成外面那个函数私有的了，即使事件绑定了函数也访问不到。
+
+6.查看项目问题：windows->show view->problems
+
+7.地址编写问题：在重定向的时候发现 地址前面加“/”和不加“/”是有区别的。例如response.sendRedirect("/Study_Response/servlet2");如果不加“/”那么地址将会显示http://localhost:8080/Study_Response/Study_Response/servlet2，这个时候是找不到资源的，只有加上“/”才是正确的地址。具体要看是需要绝对路径还是相对路径，绝对路径从根目录开始，相对路径从当前地址开始。 相对地址的时候不要加“/”最好
+
+	整体知识点总结：
+
+响应消息分为状态行、响应消息头、消息体
+
+1.状态行相关方法
+	（1）设置状态码：setStatus（int status）
+	（2）发送错误信息：sendError(int sc)/sendError(int code,String message)
+
+2.响应消息头相关方法
+	设置头字段
+	（1）void addHeader(String name,String value)
+	（2）void setHeader(String name,String value)
+	（3）void addIntHeader(String name,int value)
+	（4）void setIntHeader(String name,int value)
+	---------------------------------------------------------------
+	（5）void setContentLength(int len) --- 设置Content-Length的值
+	---------------------------------------------------------------
+	设置字符编码
+	（6）void setContentType(String type) --- 设置Content-Type的值
+	（7）void setLocale(Locale loc)
+	（8）void setCharacterEncoding(String charset) --- 设置输出内容使用的字符编码，从request中取得的值或从数据库中取出的值
+
+3.响应消息体相关方法
+	（1）getOutputStream：可以向response缓冲区中写入字节，由Tomcat服务器将字节内容组成HTTP响应返回给浏览器
+	（2）getWriter()：直接输出字符文本内容
+
+	具体案例总结：
+
+1、手动设置响应行（状态行）中的代码：
+	response.setStatus(302);
+
+2、设置响应头：
+	response.addHeader("name","zhangsan");
+	response.addHeader("name","lisi");增加新的值，不会覆盖
+	response.addIntHeader("age",18);和setHeader()差不多，专门设置Int值的头
+	response.addDateHeader("time",date.getTime());
+	response.setHeader("age","17");
+	response.setHeader("age","16"); set赋值会覆盖
+
+3、重定向/跳转
+	（1）response.setStatus(302);
+	   response.setHeader("Location","/Study_Response/servlet2");
+	（2）response.sendRedirect("/Study_Response/servlet2");功能一样，不过它显示的状态码是200
+
+4、设置定时刷新
+	response.setHeader("refresh","5;url=http://www.baidu.com");
+
+5、编码问题：
+	（1）设置response编码的码表
+		response.setCharacterEncoding("UTF-8");
+	（2）通过设置头Content-Type告诉浏览器使用何种码表解码
+		response.setHeader("Content-Type","text/html;charset=UTF-8");
+	（3）使用另一个方法来实现上面两个功能
+		response.setContentType("text/html;charset=UTF-8");
+
+6、向客户端传一张图片：
+	（1）获得服务器的图片：
+		this.getServletContext().getRealPath("a.jpg");
+	（2）获得输入字节流：
+		new FileInputSteam（xxx）;
+	（3）创建一个缓冲区数组
+		byte[] buffer = new byte[1024]
+	（4）获得字节输出流
+		response.getOutputStream();
+	（5）用一个循环输出文件
+		while((len=fileInputStream.read(buffer))>0) {
+			outputSteam.write(buffer,0,len);
+		}
+	（6）关闭资源
+		.close
+
+7、实现下载文件功能
+	html中这样写：<a href="/Study_Response/downloadServlet?filename=a.flv">a.flv</a>
+	（1）获得要下载文件的名称
+		resquest.getParameter("filename")；
+	（2）要下载的这个文件类型，客户端通过文件的MIME类型去区分
+		resquest.setContentType(this.getServletContext().getMimeType(filename));
+	（3）告诉客户端不是直接解析，而是以附件的形式保存
+		response.setHeader("Content-Disposition","attachment;filename"+filename)
+	（4）获取文件的绝对地址
+		this.getServletContext().getRealPath("download/"+fileName);
+	（5）获取输入流
+		new FileInputStream(xxx);
+	（6）创建一个缓冲区
+		byte[] buffer = new byte[1024];
+	（7）获取输出流
+		response.getOutputStream();
+	（8）创建循环输出文件
+		while((len=fileInputStream.read(buffer))>0){
+			outputStream.write(buffer,0,len);
+		}
+	（9）关闭资源
+	  	.close  ---  response获取的输出流，Tomcat服务器会帮我们关闭
+
+8.解决文件中文乱码问题
+	（1）在第1步后面添加以下内容：
+		1）获得请求头中的User-Agent
+		2）request.getHeader("User-Agent");
+		   之后根据不同的客户端进行不同的编码，在网上查找源码
+	（3）第3步中的fileName要改成filenameEncoder,也就是编码过的名字
+		response.setHeader("Content-Disposition","attachment;filename"+filenameEncoder)
+
+9.生成验证码：
+	这一步并不需要写，只需看看原理、过程就行

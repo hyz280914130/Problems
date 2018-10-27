@@ -1,0 +1,41 @@
+ 字节码对象：反射
+
+class实际运行是通过类加载器变成到内存的class对象
+
+BootStrap 底层是用C写的 主要加载的是runtime rt.jar
+BootStrap ExtClassLoadr 加载的是系统的文件
+AppClassLoader加载的自己写的，第三方也一样
+
+class对象的获取 1.class.forname相当于获取了一个类的对象，返回的是一个类 2.类名.class也一样  3.通过对象名.getClass()方法获取
+
+getResource相对于src目录 获得src下的资源的地址（绝对地址）
+getResourceAsStream()用法与getResouce()方法一样的，用getResource()取得File文件后，再new FileInputStream(file) 与 getResourceAsStream() 的效果一样。
+ew FileInputStream(file) 获得输入流
+
+Demo jdbc.properties WEB25Servlet3（3.0版本)--DemoServlet annoDemo myanno  myannptest myannpparser testdemo mytest  
+testmyparster target targetInterface protest  web24---encodingfilter  
+List list = new ArrayList() 这个集合里可以存任何类型的数据，就是杂七杂八都行，但是取得时候需要转一下类型
+
+注解的缺点：代码写死了，不方便。耦合性高
+、注解的功能需要反射去解析
+
+如果注解的属性的名称为Value，那么可以省略
+
+怎么写注解：框架完成
+怎样用注解：自己完成
+怎样解析注解：框架完成
+
+obj对象
+
+动态代理：运行期间内存动态的创建一个代理对象，不是自己创建的
+
+proxyTest object类型时 不能调用方法 要强转为代理和目标相同接口的接口类型才行
+
+proxytest2
+
+invocationHandler第三个参数是匿名内部类
+
+invoke第一个参数 proxy就是代理对象（不要轻易的用内部的这个proxy）第二个从参数method 目标方法的字节码对象 第三个对象args就是调用目标方法传递的参数（目标方法的参数）
+
+动态代理一般用于拦截
+

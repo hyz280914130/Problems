@@ -1,0 +1,144 @@
+			servlet总结
+
+0.写在前面：目前还没搞懂对象、变量、参数的区别，也搞不懂引用和调用的区别，文中可能描述不对。还有代码只写了最重要的部分，只为了回忆，具体的还需要回到源码中去。
+
+1.常见错误及解决：有时候会遇到这样的错误，拿到别人的源码，但是导入IDE之后，发现工程上面有红叉，导致这样的原因可能是本机IDE环境和别人的不一样，所以我们需要改成自己的环境，步骤如下：
+	右键工程->build path->configure build path..->找到Librarier,把报红的全去掉->然后选择Add Library..->JRE System Library->Alternate JRE,选择自己的环境即可。
+
+2.servlet：service+applet （服务器应用），sun公司提供的一套规范（接口），用来处理客户端请求、响应给浏览器的动态资源，实质就是java代码，通过java的API动态的向客户端输出内容。
+	Servlet的任务：
+		（1）获取请求数据
+		（2）处理请求
+		（3）完成响应
+	Servlet规范包含的三个技术点：
+		（1）servlet技术
+		（2）filter--过滤器
+		（3）listener技术--监听器
+
+3.开发中servlet具体的实现步骤
+	（1）创建类实现Servlet接口
+	（2）覆盖尚未实现的方法--service方法
+	（3）在web.xml进行servlet的配置
+	但实际开发中不这样进行，直接去实现Servlet接口的话，要覆盖的方法太多，所以我们一般创建类继承HttpServlet
+	实现步骤：
+	（1）创建类继承HttpServlet类
+	（2）覆盖doGet和doPost
+	（3）在web.xml中进行servlet的配置
+
+4.Servlet接口中的方法
+	（1）init(ServletConfig config)
+		何时执行：servlet对象创建时执行
+		ServletConfig:代表该servlet对象的配置信息
+	（2）service(ServletRequest request,ServletResponse response)
+		何时执行:每次请求都会执行（访问servlet）
+		ServletRequest：代表请求 认为ServletRequest内部封装的是http请求的信息
+		ServletResponse：代表响应 认为要封装的是响应的信息
+	（3）destroy()
+		何时执行：servlet销毁的时候执行
+
+5.HttpServlet类的方法
+	（1）init()
+	（2）doGet(HttpServletRequest request,HttpServletResponse response)
+	（3）doPost(HttpServletRequest request,HttpServletResponse response)
+	（4）destroy()
+
+6.Servlet的生命周期
+	（1）Servlet何时创建
+		默认第一次访问servlet时创建该对象
+		当在servlet配置时，加上一个配置<load-on-startup>则代表servlet对象在服务器启动时就创建，所以才叫默认
+	（2）Servlet何时销毁
+		服务器关闭servlet就销毁了
+	（3）每次访问必然执行的方法
+		service(ServletRequest req,ServletResponse res)
+
+7.Servlet配置
+	（1）servlet类的配置  
+	（2）servlet虚拟路径的配置
+		url-pattern的配置方式：
+		<1>完全匹配	访问的资源与配置的资源完全相同才能访问到
+		<2>目录匹配	格式：/虚拟路径/*
+		<3>扩展名匹配	*.扩展名
+		注意：第二种和第三种不能混用
+
+8.缺省Servlet
+	如果url-pattern配置一个/，就代表缺省，作用是：凡是在web.xml文件总找不到匹配的<servlet-mapping>元素的URL，他们的方位请求都将交给缺省的servlet处理。缺省的servlet负责处理。
+	tomcat中有web.xml配置，如果自己的web.xml中没找到匹配的url，那么就会根据tomcat web.xml中的缺省来处理，但是如果你在自己的web.xml中配置了缺省，则会覆盖tomcat web.xml中的缺省处理方式,如果我们不对静态资源进行相应的处理的时候，将导致静态资源无法访问。可见，Tomcat中的config/web.xml中的缺省Servlet主要处理的就是静态资源的访问。
+	web应用中所有的资源响应都是servlet负责，包括静态资源
+
+9.欢迎页面：
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		...
+		<welcome-file>index.jsp</welcome-file>
+		...
+	</welcome-file-list>
+	按顺序决定执行哪个
+
+10.ServletContext对象
+	ServletContext代表是一个web应用的环境（上下文）对象，ServletContext对象内部封装的是该web应用的信息（可以理解成一个大仓库，供servlet共享内容），ServletContext对象一个web应用只有一个
+	ServletContext对象的生命周期：
+		创建：该web应用被加载---服务器启动或者发布该web应用（前提是服务器处于启动状态）
+		销毁：web应用被卸载---服务器关闭或者移除该web应用
+	ServletContext给每个对象提供存取数据的功能。
+
+11.获得ServletContext对象
+	（1）ServletContext servletContext = config.getServletContext();
+	（2）ServletContext servletContext = this.getServletContext();
+
+12.ServletContext的作用
+	（1）获得web应用全局的初始化参数
+		ServletContext context = getServletContext();
+		String initParameter = context.getInitParameter("driver");
+	（2）获得web应用中任何资源的绝对路径
+		String path = context.getRealPath(相对于该web应用的相对地址);
+	（3）ServletContext是一个域对象（存储数据的区域就是域对象）
+		域对象的作用范围：整个web应用
+		域对象通用的方法：
+			setAttribute(String name,Object obj)
+			getAttribute(String name)
+			removeAttribute(String name)
+
+13.如何将项目发布到tomcat webapps目录下
+	service控制台空白处右键，选择新建一个tomcat服务器（此时先不要将项目添加进去），然后在service控制台双击新建的服务器，在页面中找到Service Locations->Use Tomcat installation,Server path:修改为本地tomcat服务器地址 Deploy path:修改成本地Tomcat服务器目录下的webapps文件夹，保存。然后发布项目就会自动将web项目WebContent文件夹所有内容复制到Tomcat的wabapps文件夹下。
+
+14.使用模板快速生成servlet
+	window->Preferences->Java->Editor->Templates->New->复制事先准备好的模板->应用
+
+15.通过浏览器输入一个虚拟的URL来访问服务器中的servlet,路径匹配参考xml的学习笔记。
+
+16.快速创建实体类：在类中声明好变量，然后在类的空白处右键，source->getters/serters
+
+17.servlet中service()、doGet()、doPost()方法的关系：在servlet默认的情况下，不管是get还是post提交方式都会经过service()方法来处理，把ServletRequest和ServletResponse强转为HttpServletRequest和HttpServletResponse,然后在转向doGet()和doPost()方法，网上有service的源码自己看，内容大概就是获取方法->判断->转向。反正service()是用来转向的，但是如果你在自己的service类中覆盖了service()方法（最原始的那种，没有转向功能），那么这时service()就不是用来转向的，而是用来处理业务。所以此时无论客户端是get还是post提交请求servlet，都会执行service()方法也只能执行service()，不会在去执行doPost()或者doGet()方法了。
+
+18.具体编码学习流程总结：
+	（1）分别创建了Servlet1和Servlet2两个类模拟servlet的两种实现方式。Servlet1实现Servlet接口，Servlet2继承HttpServlet类。
+		在Servlet1中重写了init()、service()、destory()方法,init()中写了这些功能：
+			1）获得servlet的name并输出
+				config.getServletName()；获取当前Servlet在web.xml中配置的名字
+			2）获得servlet的初始化参数并输出
+				config.getInitParameter("url");获取当前Servlet指定名称的初始化参数的值（xml中）
+			3）获得servlet的ServletContext对象
+				config.getServletContext(); ---- 这里分析一下为什么config可以引用getServletContext，config是servlet里的一个参数，每个servlet又都能访问到ServletContext（上下文环境），还是那句话小的对象一般都可以拿到大的引用，所以config能引用getServletContext就不奇怪了。config一个给Web容器使用的配置对象，在Servlet初始化期间将信息传递给Servlet
+	（2）编写验证登陆功能：在这之前要完成准备工作，导入C3P0、DBUtils、mysql-connector-java jar包，导入C3P0配置文件
+		需求分析：判断用户输入的用户名和密码是否正确，如果正确输出“欢迎登陆（英文）”，并告知是第几位登陆用户
+		实现步骤：（1）在Init()方法中定义一个要记录是第几位用户登陆的count值
+				this.getServletContext().setAttribute("count", count);//第一个参数是key，第二个参数是value
+			  （2）接受表单提交的参数
+				request.getParameter("username/password"); --- parameter(参数)
+			  （3）封装到实体对象中
+				User user = null; User是自己写的一个实体类
+			  （4）连接数据库并将查询存入JavaBean
+				user = qr.query(sql,new BeanHandler<User>(User.class),username,password);
+			  （5）用if判断，如果查询结果不为空，则代表数据库中有账号，输出欢迎登陆内容，并让count自增。否则，则输出不正确信息。
+				servletContext.getAttribute("count");
+				response.getWriter().write();
+				servletContext.setAttribute("count", count);
+	
+response.getWrite().write("xxx"):向前台页面显示一段信息，在普通的url方式中，会生成一个新的页面来显示内容，当在ajax的方式中，会在alert显示内容			
+	
+
+
+
+
+	
+	

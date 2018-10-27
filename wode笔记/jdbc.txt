@@ -1,0 +1,36 @@
+
+		JDBC知识总结
+
+1.DriverManager类的RegisterDriver()方法的参数是java.sql.Driver,但java.sql.Driver只是一个接口，实现类由数据库驱动来实现，MySQL驱动中java.sql.Driver接口的实现类为com.mysql.jdbc.Driver（） 所以注册的驱动为 DriverManager.RegisterDriver(new com.mysql.jdbc.Driver)
+	加强解释：java.sql.Driver它是sun公司为了简化，统一对数据库的操作，定义了一套java操作数据库的规范，由各个数据库公司自己实现，而com.mysql.jdbc.Driver()就是mysql实现了java提供的接口，每种数据库都有自己的实现类。
+
+2.总结 ：Connection 是一个接口，由DriverManager.getConnect()实现，但代码重复率太高，所以使用工具类来提取功能，吧获取连接和释放资源都写到一个类中。在简单点就创建一个properties配置方法，里面存放driver、url、username、password，使用ResourceBundle bundle = ResourceBundle.getBundle("db")来加载。因为每次执行一个sql语句都要调用DriverManager.getConnect()方法和释放资源，太浪费系统资源，所以使用连接池，里面放置好现成的连接，
+
+3.学习总结：
+	（1）最基础的jdbc连接，步骤如下：注册驱动->获取连接->创建执行SQL语句的对象（可省略这一步）->书写一个SQL语句->执行SQL语句->对结果集进行处理->关闭资源。使用到的方法有Class.forName()、DriverManager.getConnection()、createStatement()、prepareStatement()、executeQuery()、executeUpdate()、close()。处理结果集时，如果是查询就返回ResultSet rs，用while遍历或者if处理；如果是增删改，则返回一个int row,用if判断条件。
+	（2）把对象定义提取出来Connection conn = null；、Statement stmt = null;、ResultSet rs = null;	把url、user、password提取出来定义。初步简化代码。
+	（3）编写自己的工具类来进一步简化代码。
+		第一版工具类：把注册驱动、获取连接、关闭资源的功能提取出来。但是这样是硬编码，也就是说当你更换数据库之后，或者数据库密码更改就需要返回到源代码里面修改，所以编写第二版工具类优化。
+		第二版工具类：在第一版的基础上强化功能，写自己的properties配置文件，在配置文件里定义driver(全类名)、url、username、password。然后定义名称相同的四个变量driver、url、username、password。写一个静态块，在块中使用ResourceBundle bundle = ResourceBundle.getBundle("db");来引入配置文件，并使用getString()把值赋给这四个变量，以此初始化四个变量的值。如此一来，只需要更改配置文件里的值就可以连接修改数据库的配置。
+		第三版工具类：不写了，需要的时候回去看代码，其实我觉得和第二版没什么区别，反而更复杂。
+		注意事项：工具类里面的方法都是静态类，方便调用，关闭资源方法需要有三个形参。
+	（4）连接池：自己编写的工具类的基础上，由于每一次增删该查都需要连接数据库并关闭，这样太消耗资源，所以使用连接池来优化，连接池里面存储了连接，需要时调用，用完归还，这样一来就不需要每次都连接关闭数据库资源。
+		第一版连接池：写一个MyDataSource方法来实现DataSource接口（DataSource时DriverManager替代品，DataSource 对象是获取连接的首选方法。）
+				1）创建一个容器来存储Connection对象：private static LinkedList<Connection> pool = new LinkedList<Connection>()
+				2)写一个静态块，用一个for循环来创建指定数量的连接，用pool.add(conn);来将连接添加到连接池里。
+				3)重写getConnection方法,先判断连接池里还有没有连接，如果没有则创造几个，取走连接使用conn=pool.remove(0);注意要返回conn。
+				4)写归还连接的方法。归还连接使用pool.add(conn);有一个形参来获取需要归还的连接。
+		第二版连接池：连接池里面我们使用了自己定义的工具类里面的getConnection方法，但是我们需要关闭资源啊，使用工具类的release()关闭
+资源，但是这样的话资源就不会返回到连接池了（注意第一版工具类只是归还了conn，并没有关闭资源。），所以我们写了MyConnection实现类,接收Connection其他的实现类来编写MyConnection的构造函数，然后重写了Connection接口的close()方法，以及我们需要使用到的Connection接口的所有方法。
+然后我们添加到连接池里的就是自己MyConnection实现类的myconn对象了，我们自定义工具类里面的方法也就变成了MyConnection里面的close()方法
+	(5)c3p0连接池：以上的是连接池的基础，我们开发使用C3P0连接池。在使用这个连接池之前我们需要编写一个自定义工具类，作用就是为了简化代码，
+			1）自定义工具类：使用c3p0这个工具类就必须创建它的实例化对象。private static ComboPooledDataSource dataSource = new ComboPooledDataSource();（括号里不写内容就是使用C3P0默认的配置。同样的c3p0也有自己的jdbc连接使用的工具类，它也有自己的配置文件，存放了driver、url、username、password这些东西，具体看它的配置文件。）然后编写获取数据源（连接池）的方法、获取连接的方法。
+			2）写完工具类，实际使用起来就和MyConnection一样
+	（6）简化JDBC操作的组件DBUtils
+		1）创建核心对象：QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+		2）编写sql语句
+		3）设置值Object[] params = {..,..,..,}；
+		4）更新或者查询  qr.update qr.query
+		5）处理结果
+
+4.domain代表实体类

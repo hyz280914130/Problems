@@ -1,0 +1,58 @@
+			总结
+
+1.什么是事务：一件事情有N个单元，这N个单元要么同时成功，要么同时失败。比如转账，张三转钱给李四，如果在转钱过程中发生意外，如果没有事务可能导致，张三账户的钱转出去了，但是李四却没有收到。事务固有属于数据库。
+
+2.数据库的事务默认是开启的，也就是说你输入语句确认之后，数据库自动提交。开始事务start transation之后，输入语句要自己提交，数据才会真正存到数据库磁盘，比如你插入一条记录，但没有提交，虽然能在表中看到数据，但此时这条数据是假的，并没有真正存到磁盘，当你把CMD关闭，它就自动消失了。commit提交之后，代表这次手动事务结束。
+
+3.Threadlocal（线程）:使用ThreadLocal绑定连接资源，比如一个connection连接，<Thread(名称默认的)，value>像是一个MAP集合,一次只能绑一个值，如果想要绑定多个值，那么可以value可以是一个集合
+
+4.JDBC的事务操作：
+	自动提交方式：executeUpdata()
+	手动提交方式：
+			开启事务：conn.setAutoCommit(false);
+			提交事务：conn.commit();
+			回滚事务：conn.rollback();
+	注意事项：控制事务的connection必须是同一个（开启到提交）
+
+5.DBUtils的事务提交操作
+	1）有参构造：QueryRunner qr = QueryRuner(DataSource dataSource);
+		传入一个连接池，每次执行SQL语句都从里面取走一个连接
+	2）无参构造：QueryRunner qr = QueryRunner(DataSource dataSource);
+		无参，需要用QueryRunner操作数据库时传入一个数据，事务就用这种方法，因为如果使用有参的就会导致每次取到的连接是随机的。
+				
+4.事务的特性和隔离级别 --- 概念性的问题面试容易问
+	1）事务的特性ACID
+		1）原子性：原子性是指事务是一个不可分割的工作单位，事务中的操作要么全发生，要么全不发生。
+		2）一致性：一个事务中，事务前后的数据必须保持完整一致，比如转账，不中间不可能多出钱或少钱，一定是平衡的。
+		3）隔离性：多个用户并发访问数据库时，一个用户的事务不能被其他用户事务干扰。
+		4）持久性：一个事务一旦被提交，那么他对数据库的更新是永久的。
+
+5.并发访问问题 --- 隔离性相关
+	如果不考虑隔离性，事务将存在3种并发访问问题
+	1）脏读：B事务读取到A事务尚未提交的数据
+	2）不可重复读：两次读取数据的内容不一致
+	3）幻读/虚读：两次读取数据的数量不一样
+
+6.事务的隔离级别
+	1）read uncommitted：允许读取尚未提交的数据
+	2）read committed：只能读取提交后的数据，oracle --- 可以解决脏读的问题
+	3）repeatable read：重复读取 --- 可以解决脏读和不可重读的问题
+	4）serializable：串行化 --- 解决脏读、不可重复度、虚读，但是效率很低
+
+7.隔离级别的性能
+	read uncommitted>read committed>repeatable read>serialazable
+	安全性：
+	read uncommitted<read committed<repeatable read<serialazable
+
+7.mysql查看和修改数据库的隔离级别
+	查看：select @@tx_isolation
+	修改：set session transaction isolation level 隔离级别
+
+
+
+
+		转账案例总结
+web层：获取数据 --> 传递数据给service层，调用service层的转账方法
+service层：调用dao层方法
+dao层：两个方法，一个转出、一个转入。
+

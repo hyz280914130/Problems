@@ -1,0 +1,45 @@
+url-pattern：配的是要对那些资源进行过滤
+
+请求到目标资源中间可能有N个过滤器，也可能不会被拦截
+
+一般在web包下面创建三个包 filter listener servlet
+
+
+每次请求都会创建新的request response ，多个过滤器组成一条链，再一次请求链中，前面过滤器设置的资源，后面的过滤器都能取到
+
+功能：设置权限
+
+filter服务器启动就创建
+
+Spring是通过配置一个ContextLoaderListener和web工程联系
+struts2是通过配置一个filter和web工程联系
+
+ssh安全外壳协议
+
+生命周期：
+	何时创建 何时销毁 何时执行对应的方法
+
+filterChain内部维护着所有filter的索引，比如知道下一个filter的位置，放行
+
+servletrequest 和httpservletrequest 的区别
+
+filter运行的顺序是根据filter-mapping配置的顺序执行
+
+url-pattern 是根据虚拟路径配置的，目录匹配，后缀名匹配，完全匹配等等，来控制那些内容需要过滤
+Servlet-name 是根据Servlet名称配置的，他俩的效果一样
+
+
+QuickFilter1 配置 servlet1 QuickFilter2 配置 servlet2 LoginServlet user UserService UserDao  AutoLoginFilte
+ 配置 注释 encoding.jsp EncodingServlet
+dispatcher四种配置：
+	request：只有直接访问才执行filter，比如转发的就不算，重定向算（返回客户端在访问）
+	forward：只有在转发时执行，而且是在转发后才触发
+	include：
+
+AutoLoginFilte：是功能增强，不是拦截
+
+cookie不能写中文:解决--先编码在解码
+URLEncoder.encode
+
+tomcat默认全部都是用ISO-8859-1编码
+

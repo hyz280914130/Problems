@@ -1,0 +1,22 @@
+关系型数据库 Oracle Mysql 靠关系表
+redis
+NoSQL数据库：N O，去掉关系特性
+集群：银行一个窗口服务，多个窗口服务
+高并发 高负载 高可扩展
+像一个大MAP 键值对
+字符串 三种集合list和set sortset map
+redis使用的端口 6379
+运行时记得加./
+操作redis需要再开一个客户端 执行redis-cli（另一个启动着redis）
+真正开发中不关闭池子
+jedistest jedispoolutilsv redis.properites 
+
+Array查询快 list增删改快  
+
+no数据库是啥
+redis安装
+jedis
+redis的数据操作类型 5种
+redis的其他
+
+

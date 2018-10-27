@@ -1,0 +1,86 @@
+				
+				xml知识总结
+1.xml：可扩展的标记语言，常用于配置文件（记录类全名等）、存放数据
+
+2.dom4j解析
+	解析器：解析有三种方式，DOM、SAX、PULL
+	DOM:把整个XML文档加载进内存，并解析成一个document对象。
+		优点：元素与元素之间保留结构关系，所以可以进行增删该查。
+		缺点：XML文档过大，可能出现内存溢出现象。
+	SAX：一边扫描一边解析，每扫描一行就解析一行（触发相应的事件），以事件驱动的方式进行解析。
+		优点：速度快，可以处理大文件
+		缺点：只能读，逐行读后释放资源
+	PULL：Android内置解析器，类似SAX。
+	常见的解析开发包：JAXP、JDom、jsoup、dom4j
+
+3.DTD约束：规定xml文档的节点名称、出现顺序、元素的属性。一般由框架提供，使用DTD约束的常见框架有struts2、hibernate，DTD约束一般与XML配置文件放在同一目录下。在XML头部添加<!DOCTYPE web-app SYSTEM "xxx.dtd">外部引入DTD约束。
+
+4.DTD元素声明：<!ELEMENT 元素名 元素描述>
+	元素描述：
+			什么都没有表示默认，必须出现一次且只能出现一次
+			？表示对象可以出现，但是只能出现一次
+			* 表示对象可以出现任意多次，也可以是零次
+			+ 表示对象最少出现一次，也可以出现多次
+		       () 给元素分组，或添加描述信息（#PCDATA）
+			| 表示在列出对象中选择一个
+			，对象那个必须按顺序出现
+	属性语法：
+			<!ATTLIST 元素名
+				属性名 属性类型 约束
+				...
+			>
+			属性类型：ID、CDATA、枚举...
+				ID：用来标识元素的唯一性
+				CDATA：文本
+				枚举：（E1|E2|E3...）多选一
+			约束：#REQUIRED  说明属性是必须的
+			      #IMPILED   说明属性可选
+
+5.schema约束：比DTD更强大的约束，本身是xml文件，但扩展名为xsd，数据类型更完善，支持命名空间（类似于包名，解决不同XML文件相同的元素名的问题）
+	命名空间：默认（schema）隐式、显式（xsd:schema）
+
+6.schema约束和xml的关系：官方约束文档->框架开发者自定义schema文档->自己的xml文档。
+
+7.dom4j API使用：
+	1.SaxReader 获得解析器
+	2.read（url）获得document文档对象
+	3.getRootElement()获得根元素
+	4.element()获得子元素
+	5.遍历子元素（如果需要遍历）
+		"xxx".equals(element.getName())判断名称为xxx的元素
+		element()获取xxx下的子元素
+
+8.反射：一个类中的方法，如果使用需要创建对象，但是如果这个类正在运行，就不可能回到源代码去创建一个对象来使用，此时使用反射来通过类全名获取该类的字节码文件，在通过这个字节码文件创建实例化对象，使用这个实例化对象来使用这个类里面的方法。
+	Class.forName()获取类全名
+	newInstance()创建实例对象
+	在知道要使用的类名的前提下，可以使用这个类名来给实例化的对象指定为该类类型，这样就可以直接使用这个方法，不然就看下面的步骤
+
+9.dom4j和反射结合使用：
+	在xml文件中配置了servlet下的servlet-name（类名）和servlet-class（类全名），servlet-mapping下的servlet-name(类名)，url-pattern（url）。一般通过浏览器通过url来匹配到相应的类全名，在通过代码（反射），执行相应的方法。匹配的过程是这个的：url先匹配同样是servlet-mapping节点下的servlet-name,然后通过这个servlet-name来匹配servlet下的servlet-name，再通过servlet下的servlet-name匹配到servlet-class
+	代码中的具体步骤：
+		读xml文件的方法：
+		1.创建解析器对象	SAXReader()
+		2.用解析器加载web.xml，获取doucment文档对象	read()
+		3.获取根元素节点	getRootElement()
+		4.获取子节点集合	elements（注意不是element）
+			遍历集合 
+			5.判断元素名称为servlet的节点	
+				6.获取servlet元素节点的servlet-name和servlet-class的值	element("servlet-name").getText()/element("servlet-class").getText()
+		7.在方法体的外面创建一个HashMap<String,String>集合 HashMap<String,String>()
+				8.将值放入map集合 data.put(servletName, servletClass);	data是创建Map集合时创建的对象
+			9.判断元素名称为servlet-mapping的元素节点
+				10.获取servlet-mapping元素节点的servlet-name和url-pattern的值
+				11.将servletName作为key获取servletClass的值	String servletClass = data.get(servletName);
+				12.将url-pattern作为key,servletClass作为value存到map中去	data.put(urlPattern, servletClass);
+				13.移除servletNameText	data.remove(servletName);
+		测试方法：
+		14.模拟在服务器输入一个地址	创建一个String
+		15.这个地址作为key获取servletClass	data.get(url)
+		16.通过类全名获取class字节码文件	Class.forName(servletClass)
+		17.使用字节码文件创建实例化对象		newInstance()
+		18.通过字节码文件获知指定名称的方法（第一个参数是方法名，第二个是参数）		getMethod("service", null);
+		19.调用invoke执行方法，（第一个调用方法的实例化对象，第一个是方法的实参）	invoke(my, null);		
+		
+
+  
+			

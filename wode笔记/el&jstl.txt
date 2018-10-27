@@ -1,0 +1,78 @@
+
+
+
+	EL总结
+
+1.什么是el：为了使jsp写起来更简单，格式为 --- ${表达式}，el最重要的作用是从域中取出数据
+
+2.page是为了简写jsp中的代码，${}里面的的pageContext.request. 和jsp中的是同一对象
+
+2.EL从域中取出数据:
+		1）获得pageContext域中的值：${pageScope.key}
+		2）获得request域中的值：${requestScope.key}
+		3）获得session域中的值：${sessionScope.key}
+		4）获得application域中的值：${applicationScope.key}
+		5）获得四个域中某个值：${key} --- 依次从pageContext域，request域，session域，application域中获取属性，在某个域中获取后将不在向后寻找
+
+2.内置对象11个：
+	pageScope、requestScope、sessionScope、application --- jsp中获取域的数据
+	param、paramValues --- 接受参数
+	header、headerValues --- 获取请求头数据
+	initParam --- 获取全局初始化参数
+	cookie --- 相当于request.getCookies()---cookie.getName()---cookie.getValue(）
+	pageContext --- 可以获得其他八大对象，${pageContext.request.contextPath}，相当于<%=pageContext.getRequest().getContextPath%>，不过这句代码不能实现，因为他获取的不是HttpServlet request。
+	
+	
+
+
+	JSTL总结	
+
+1.什么是jstl：是一个不断完善的开放源代码的jsp标签库。由5个不同功能的标签库共同组成
+	      Core:前缀c、I18N：前缀fmt、SQL：前缀sql、XML：前缀x、Function：前缀fn
+
+2.标签库：其他的知道就行，只需要学习Core标签库
+		Core --- http://java.sun.com/jsp/jstl/core --- 前缀C
+
+3.Core标签库： 
+		1) <c:if test=""> --- test是返回boolean的条件
+
+		2）	<c:forEach begin="" end="" var="i">
+			执行体
+			<c:forEach>
+			相当于：
+			for(int i=0;i<=5;i++){
+				syso{i}
+			}
+			<c:forEach items="" var="">
+			执行体
+			<c:forEach>
+		
+
+
+
+	开发模式总结
+
+1.MVC： --- web开发的设计模式
+	M：Model---模型 javaBean：封装数据
+	V：View-----视图 jsp：单纯进行页面的显示
+	C：Controller----控制器 Servelt：获取数据--对数据进行封装--传递数据--指派显示的jsp页面
+	
+2.javaEE三层架构
+	web层：与客户端交互
+	service：复杂业务处理
+	dao层：与数据库进行交互
+
+
+
+扩展：集合和数组
+	1）集合：只能存储对象，对象类型可以不一样，集合长度可变
+		List（有序、可重复）
+		Set（无序、不能重复）
+		Map（键值对、键唯一、值不唯一）
+	2）数组：用来存现对象的一种容器，但是数组的长度固定，且存储的类型要一致
+
+	
+
+	案例总结：
+重写显示列表：
+	分析：从数据库取走数据给jsp显示

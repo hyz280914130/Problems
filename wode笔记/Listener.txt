@@ -1,0 +1,7 @@
+MyServletContextListener MyHttpSessionListener MyServletContextAttributeListener TestMyServletContextAttributeListener Person TestPersionBindingServlet Customer TestCustomerActiveServlet TestCustomerActiveServlet2 钝化的配置文件
+
+每一个监听都需要配置
+
+format.parse（）将一个字符串转成特定类型的Date
+
+jsp有内置对象 page头那儿有一个默认的session=true

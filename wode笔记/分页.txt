@@ -1,0 +1,16 @@
+vo实体:页面上要显示的数据
+
+do实体：数据库中的东西
+
+trim的作用是除去字符串两端的空白字符，然后返回新的字符串
+
+list.toArray() 强制转换把list转为Array
+
+request.getParameter获取到的都是String类型，所以如果需要还要强转一下
+getAttribute(String,Object)设置的值是Object
+
+Integer.parseInt(String)就是将String字符类型数据转换为Integer整型数据
+
+math.ceil(x)返回大于等于参数x的最小整数,即对浮点数向上取整.
+
+ScalarHandler()是将结果的一列存为object返回，但是因为数据库取到的数据是Long类型的，不能强制转换为int。所以要先强转为Long，在转为int
