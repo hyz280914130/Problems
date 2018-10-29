@@ -16,7 +16,7 @@
 		System.out.println("构造块");
 	}
   
-  TestMain(){
+  public TestMain(){
     System.out.println("构造函数");
   }
 	
@@ -61,7 +61,10 @@
     2.使用getClassLoader()，会把类装载进内存，但不进行初始化，什么都不打印，除非newInstance()实例化对象
     3.Class.forName()会对类进行初始化，对象不进行初始化，静态块打印。
     
-  三、详情
+  三、补充
+    1.构造函数不能有void，因为构造函数规定不能有任何返回值，而“ void ”是表示为一个空的返回值。
+    
+  四、详情
     <a href="http://www.cnblogs.com/ivanfu/archive/2012/02/12/2347817.html">更详细的了解</a>
     
 </pre>
